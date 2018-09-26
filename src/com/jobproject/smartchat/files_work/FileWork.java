@@ -1,13 +1,11 @@
 package com.jobproject.smartchat.files_work;
 
-import com.jobproject.smartchat.output.TextShower;
-
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class FileWork
 {
     private String currentAnswer;
-    private FileReader fileReader;
     private StringBuffer stringBuffer;
 
     public FileWork()
@@ -18,9 +16,13 @@ public class FileWork
     private void initialize()
     {
         stringBuffer = new StringBuffer();
+    }
+
+    public String readFile(int flag)
+    {
 
         try(FileInputStream myFile = new FileInputStream("./bin/abc.txt");
-            InputStreamReader inputStreamReader = new InputStreamReader(myFile, "UTF8");
+            InputStreamReader inputStreamReader = new InputStreamReader(myFile, StandardCharsets.UTF_8);
             Reader reader = new BufferedReader(inputStreamReader))
         {
             int ch;
@@ -28,12 +30,29 @@ public class FileWork
             while ((ch = reader.read()) > -1)
                 stringBuffer.append((char)ch);
             //
-            String result = stringBuffer.toString();
+            currentAnswer = stringBuffer.toString();
 
-            new TextShower(result);
         } catch (IOException e)
         {
             e.printStackTrace();
+        }
+
+        return currentAnswer;
+    }
+
+    public void writeToFile(String input, int flag)
+    {
+        try(FileOutputStream myFile = new FileOutputStream("./bin/abcd.txt");
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
+            Writer out = new BufferedWriter(outputStreamWriter);)
+        {
+            //String myAddress = "my address is here";
+            out.write(input);
+
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            // ..
         }
     }
 }

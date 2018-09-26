@@ -2,12 +2,11 @@ package com.jobproject.smartchat.output;
 
 public class TextShower
 {
-    public TextShower(String strOut)
+    public TextShower()
     {
-        this.textOut(strOut);
     }
 
-    void textOut(String str)
+    public void textOut(String str)
     {
         System.out.println(str);
     }
