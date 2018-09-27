@@ -1,15 +1,30 @@
 package com.jobproject.smartchat;
 
-import com.jobproject.smartchat.files_work.FileWork;
-import com.jobproject.smartchat.output.TextShower;
+import com.jobproject.smartchat.userinterface.GetText;
 
-public class StartChat {
-
+public class StartChat
+{
     public static void main (String args[])
     {
-        FileWork file = new FileWork();
-        TextShower textShower = new TextShower();
-        textShower.textOut(file.readFile(0));
-        file.writeToFile(0);
+        boolean flag = true;
+        String userText;
+        GetText getText = new GetText();
+        Commands comWork = new Commands();
+
+        while(flag)
+        {
+            userText = getText.inputConsole();
+            flag = comWork.answer(userText);
+
+
+        }
+
+
+
+
+
+
+
+        //file.writeToFile("some text to input", 0);
     }
 }
