@@ -1,8 +1,13 @@
 package com.jobproject.smartchat.files_work;
 
+/*
+* General class for work with helping files
+* */
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class FileWork
@@ -43,7 +48,6 @@ public class FileWork
     // read all from file, adding answers into current fields
     private void readAllIntoArray()
     {
-        StringBuffer stringBuffer = new StringBuffer();
         StringBuffer stringBufferAll = new StringBuffer();
         //
         try(FileInputStream myFile = new FileInputStream(currentFilePath);
@@ -57,16 +61,14 @@ public class FileWork
             while ((ch = reader.read()) > -1)
             {
                 stringBufferAll.append((char)ch);
-                //
-                if (ch != '\n')
-                {
-                    stringBuffer.append((char) ch);
-                } else
-                {
-                    allAnswers.add(stringBuffer.toString());            // save found line
-                    stringBuffer.delete(0, stringBuffer.length()+1);    // clear StringBuffer
-                }
             }
+            //
+            // get all info from file into class field
+            allFileInfo = stringBufferAll.toString();
+
+            // splitting gotten string into list
+            allAnswers = new ArrayList<>(Arrays.asList(allFileInfo.split("\n")));
+
             // check gotten massive: first line, last line and at list one answer
             try
             {
@@ -76,9 +78,6 @@ public class FileWork
             {
                 e2.printStackTrace();
             }
-
-            // get all info from file into class field
-            allFileInfo = stringBufferAll.toString();
 
             // get size of answers mass
             int currentMassSize = allAnswers.size();
@@ -195,3 +194,61 @@ public class FileWork
         }
     }
 }
+
+
+//    // read all from file, adding answers into current fields
+//    private void readAllIntoArray()
+//    {
+//        StringBuffer stringBuffer = new StringBuffer();
+//        StringBuffer stringBufferAll = new StringBuffer();
+//        //
+//        try(FileInputStream myFile = new FileInputStream(currentFilePath);
+//            InputStreamReader inputStreamReader = new InputStreamReader(myFile, StandardCharsets.UTF_8);
+//            Reader reader = new BufferedReader(inputStreamReader))
+//        {
+//            int ch;
+//            ArrayList<String> allAnswers = new ArrayList<>();
+//
+//            // getting massive with all strings from file
+//            while ((ch = reader.read()) > -1)
+//            {
+//                stringBufferAll.append((char)ch);
+//                //
+//                if (ch != '\n')
+//                {
+//                    stringBuffer.append((char) ch);
+//                } else
+//                {
+//                    allAnswers.add(stringBuffer.toString());            // save found line
+//                    stringBuffer.delete(0, stringBuffer.length()+1);    // clear StringBuffer
+//                }
+//            }
+//            // check gotten massive: first line, last line and at list one answer
+//            try
+//            {
+//                if (allAnswers.size() < 3)
+//                    throw new Exception("there are not enough lines with answers in current file");
+//            } catch (Exception e2)
+//            {
+//                e2.printStackTrace();
+//            }
+//
+//            // get all info from file into class field
+//            allFileInfo = stringBufferAll.toString();
+//
+//            // get size of answers mass
+//            int currentMassSize = allAnswers.size();
+//
+//            // get general answers from gotten massive
+//            for(int i = 1; i < currentMassSize-1; i++)
+//                lstAnswers.add(allAnswers.get(i));
+//
+//            // get first and last lines from gotten massive
+//            this.welcomeAnswer = allAnswers.get(0);
+//            this.goodbyeAnswer = allAnswers.get(currentMassSize-1);
+//
+//        } catch (IOException e)
+//        {
+//            e.printStackTrace();
+//        }
+//    }

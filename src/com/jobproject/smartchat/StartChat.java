@@ -15,15 +15,7 @@ public class StartChat
         {
             userText = getText.inputConsole();
             flag = comWork.answer(userText);
-
-
         }
-
-
-
-
-
-
 
         //file.writeToFile("some text to input", 0);
     }

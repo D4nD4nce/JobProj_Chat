@@ -1,5 +1,9 @@
 package com.jobproject.smartchat.userinterface;
 
+/*
+* Class encapsulates work with user input
+* */
+
 import java.util.Scanner;
 
 public class GetText
