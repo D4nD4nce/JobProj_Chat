@@ -1,5 +1,10 @@
 package com.jobproject.smartchat.commands;
 
+/*
+* general enum class for all special commands in program
+* includes string keys, enum values and descriptions
+ */
+
 import java.util.HashMap;
 import java.util.Map;
 
