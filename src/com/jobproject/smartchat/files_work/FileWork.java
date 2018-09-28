@@ -12,12 +12,13 @@ import java.util.Random;
 
 public class FileWork
 {
-    public static final int READ_RANDOM_STRING      = 0x000000001;      // main method, get random string from file
-    public static final int READ_ALL                = 0x000000010;      // for tests
-    public static final int READ_WELCOME            = 0x000000011;      // for first "welcome" string from file
-    public static final int READ_GOODBYE            = 0x000000100;      // for last "goodbye" string from file
+    public static final int READ_RANDOM_STRING      = 1;                // main method, get random string from file
+    public static final int READ_ALL                = 2;                // for tests
+    public static final int READ_WELCOME            = 3;                // for first "welcome" string from file
+    public static final int READ_GOODBYE            = 4;                // for last "goodbye" string from file
 
-    private String currentFilePath;                                     // "./bin/abc.txt"
+    private AllFiles eFiles;
+    private String currentFilePath;                                     // "./bin/general.txt"
     private String currentAnswer;                                       // current randomly chosen string from list
     private ArrayList<String> lstAnswers;                               // list with all strings from file except first and last
     private String welcomeAnswer;                                       // first line from file
@@ -29,13 +30,93 @@ public class FileWork
         initialize();
     }
 
+    // choosing new random helping file for user answers
+    public void chooseNewFile()
+    {
+        setCurrentFile(getRandomFilePath());
+    }
+
+    // read chosen File
+    public String readFile(int flag)
+    {
+        switch (flag)
+        {
+            case READ_RANDOM_STRING:
+                return readRandom();
+            case READ_ALL:
+                return readAll();
+            case READ_WELCOME:
+                return readWelcome();
+            case READ_GOODBYE:
+                return readGoodbye();
+            default:
+                return "no flag found";
+        }
+    }
+
+    // get string with path of chosen file witch program reads from
+    public String getCurrentFilePath()
+    {
+        return currentFilePath;
+    }
+
+    // get current variable marked as answer
+    public String getCurrentAnswer()
+    {
+        return currentAnswer;
+    }
+
+    // write string to chosen file
+    public void writeToFile(String output, int flag)
+    {
+        try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
+            Writer out = new BufferedWriter(outputStreamWriter))
+        {
+            //String myAddress = "my address is here";
+            out.write(output);
+
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            // ..
+        }
+    }
+
+    // write array to chosen file
+    public void writeToFile(ArrayList<String> output, int flag)
+    {
+        try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
+            Writer out = new BufferedWriter(outputStreamWriter))
+        {
+            //String myAddress = "my address is here";
+            output.forEach((str) ->
+            {
+                try
+                {
+                    out.append(str);
+                } catch (IOException e1)
+                {
+                    e1.printStackTrace();
+                }
+            });
+            //
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            // ..
+        }
+    }
+
     // initializing globals, reading current file
     private void initialize()
     {
         lstAnswers = new ArrayList<>();
-
         currentAnswer = "no answer initialized";
-        setCurrentFile("./bin/abc.txt");       // default
+
+        // setting random helping file for answers
+        setCurrentFile(getRandomFilePath());
     }
 
     // choosing path for file to read from
@@ -43,6 +124,16 @@ public class FileWork
     {
         currentFilePath = filePath;
         readAllIntoArray();
+    }
+
+    // getting random path for helping user file
+    private String getRandomFilePath()
+    {
+        Random rand = new Random();
+        AllFiles files[] = AllFiles.values();
+        int lengh = files.length;
+
+        return files[rand.nextInt(lengh-1)].getDescription();
     }
 
     // read all from file, adding answers into current fields
@@ -96,36 +187,6 @@ public class FileWork
         }
     }
 
-    // read chosen File
-    public String readFile(int flag)
-    {
-        switch (flag)
-        {
-            case READ_RANDOM_STRING:
-                return readRandom();
-            case READ_ALL:
-                return readAll();
-            case READ_WELCOME:
-                return readWelcome();
-            case READ_GOODBYE:
-                return readGoodbye();
-            default:
-                return "no flag found";
-        }
-    }
-
-    // get string with path of chosen file witch program reads from
-    public String getCurrentFilePath()
-    {
-        return currentFilePath;
-    }
-
-    // get current variable marked as answer
-    public String getCurrentAnswer()
-    {
-        return currentAnswer;
-    }
-
     // general - get random string from chosen file
     private String readRandom()
     {
@@ -149,49 +210,6 @@ public class FileWork
     private String readGoodbye()
     {
         return goodbyeAnswer;
-    }
-
-    // write string to chosen file
-    public void writeToFile(String output, int flag)
-    {
-        try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
-            Writer out = new BufferedWriter(outputStreamWriter))
-        {
-            //String myAddress = "my address is here";
-            out.write(output);
-
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-            // ..
-        }
-    }
-
-    // write array to chosen file
-    public void writeToFile(ArrayList<String> output, int flag)
-    {
-        try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
-            Writer out = new BufferedWriter(outputStreamWriter))
-        {
-            //String myAddress = "my address is here";
-            output.forEach((str) ->
-            {
-                try
-                {
-                    out.append(str);
-                } catch (IOException e1)
-                {
-                    e1.printStackTrace();
-                }
-            });
-            //
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-            // ..
-        }
     }
 }
 

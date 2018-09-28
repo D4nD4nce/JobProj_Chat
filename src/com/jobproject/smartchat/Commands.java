@@ -9,15 +9,14 @@ import com.jobproject.smartchat.userinterface.TextShower;
 
 public class Commands {
 
-    public static final int NO_COMMANDS_FOUND = 0;
-    public static final int CHANGE_FILE = 1;
-    public static final int CLOSE_CHAT = 2;
+    public static final int NO_COMMANDS_FOUND       = 0;        // no special commands, return random answer
+    public static final int CHANGE_FILE             = 1;        // change helping file with answers
+    public static final int CLOSE_CHAT              = 2;        // shutdown program
 
     private String userText;
     private FileWork file;
     private int currentCommand;
     private TextShower textShower;
-
 
     public Commands()
     {
@@ -29,6 +28,7 @@ public class Commands {
         showWelcome();
     }
 
+    // checking input for having command
     public static int commandCheck(String txt)
     {
         switch (txt)
@@ -38,8 +38,6 @@ public class Commands {
             case "/change":
                 return CHANGE_FILE;
         }
-        //this.userText = text;
-        // if commands ==
         return NO_COMMANDS_FOUND;
     }
 
@@ -65,6 +63,18 @@ public class Commands {
         return true;
     }
 
+    // get text user wrote
+    public String getUserText()
+    {
+        return userText;
+    }
+
+    // get current command if it exists
+    public int getCurrentCommand()
+    {
+        return currentCommand;
+    }
+
     // shows general answer for user
     private void showText()
     {
@@ -86,6 +96,7 @@ public class Commands {
     // changing current file
     private void changeFile()
     {
+        file.chooseNewFile();
         textShower.outputConsole("file chosen");
     }
 }

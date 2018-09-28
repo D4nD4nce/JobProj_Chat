@@ -8,3 +8,8 @@ Chat application that works using console and supportive files. After writing an
 3. Add into chat console commands:
     - to switch helping files with answers
     - to close program.
+    
+TO DO:
+1. Отладить выполнение команды смены файла.
+2. Отладить работу программы при вводе пустой строки
+3. Подумать над умным ответом программы (?)
