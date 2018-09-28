@@ -21,8 +21,18 @@ public enum AllCommands
     // checking input for having command
     public static AllCommands commandCheck(String txt)
     {
-        if (txt.isEmpty())
-            return EMPTY_STRING;
+        try
+        {
+            if (txt == null)
+                throw new NullPointerException("null string to check");
+            //
+            if (txt.isEmpty())
+                return EMPTY_STRING;
+
+        } catch (NullPointerException eNull)
+        {
+            eNull.printStackTrace();
+        }
         //
         if(commandsMap.containsKey(txt))
             return commandsMap.get(txt).getCommandValue();

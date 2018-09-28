@@ -36,22 +36,30 @@ public class FileWork
         setCurrentFile(getRandomFilePath());
     }
 
-    // read chosen File
+    // read chosen File depending on flags
     public String readFile(int flag)
     {
-        switch (flag)
+        try
         {
-            case READ_RANDOM_STRING:
-                return readRandom();
-            case READ_ALL:
-                return readAll();
-            case READ_WELCOME:
-                return readWelcome();
-            case READ_GOODBYE:
-                return readGoodbye();
-            default:
-                return "no flag found";
+            switch (flag)
+            {
+                case READ_RANDOM_STRING:
+                    return readRandom();
+                case READ_ALL:
+                    return readAll();
+                case READ_WELCOME:
+                    return readWelcome();
+                case READ_GOODBYE:
+                    return readGoodbye();
+                default:
+                    throw new Exception("wrong flag in read file method");
+            }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
+        //
+        return "";
     }
 
     // get string with path of chosen file witch program reads from
@@ -69,6 +77,15 @@ public class FileWork
     // write string to chosen file
     public void writeToFile(String output, int flag)
     {
+        try
+        {
+            if (output == null)
+                throw new Exception("output string is null");
+        }catch (Exception e1)
+        {
+            e1.printStackTrace();
+        }
+        //
         try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
             Writer out = new BufferedWriter(outputStreamWriter))
@@ -86,6 +103,15 @@ public class FileWork
     // write array to chosen file
     public void writeToFile(ArrayList<String> output, int flag)
     {
+        try
+        {
+            if (output == null)
+                throw new Exception("output array is null");
+        }catch (Exception e1)
+        {
+            e1.printStackTrace();
+        }
+        //
         try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
             Writer out = new BufferedWriter(outputStreamWriter))
@@ -96,13 +122,13 @@ public class FileWork
                 try
                 {
                     out.append(str);
-                } catch (IOException e1)
+                } catch (IOException | NullPointerException e1)
                 {
                     e1.printStackTrace();
                 }
             });
             //
-        } catch (IOException e)
+        } catch (IOException | NullPointerException e)
         {
             e.printStackTrace();
             // ..
@@ -124,6 +150,7 @@ public class FileWork
     private void setCurrentFile(String filePath)
     {
         currentFilePath = filePath;
+        // reading current file and setting all variables
         readAllIntoArray();
     }
 
@@ -135,9 +162,10 @@ public class FileWork
 
         int lengh = files.length;
 
-        String currentPath = getCurrentFilePath();
-        String newPath = files[rand.nextInt(lengh-1)].getDescription();
+        String currentPath = getCurrentFilePath();                                      // get current path
+        String newPath = files[rand.nextInt(lengh-1)].getDescription();         // get new path
         //
+        // check for new path, get another if it's the same
         if (currentPath != null && !currentPath.isEmpty())
         {
             while(currentPath.compareTo(newPath) == 0)

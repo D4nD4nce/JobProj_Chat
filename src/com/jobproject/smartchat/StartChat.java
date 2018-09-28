@@ -16,7 +16,7 @@ public class StartChat
         // take input in cycle while user writes anything until activating shutdown command
         while(flag)
         {
-            flag = comWork.answer(getText.inputConsole());
+            flag = comWork.answer(getText.getInputText());
         }
 
         //file.writeToFile("some text to input", 0);

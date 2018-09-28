@@ -32,6 +32,15 @@ public class CommandWork
     // general answer for user, return false on shutdown command
     public boolean answer(String txt)
     {
+        try
+        {
+            if (txt == null)
+                throw new NullPointerException("got string is null");
+        }catch (NullPointerException eNull)
+        {
+            eNull.printStackTrace();
+        }
+        //
         this.userText = txt;
         this.currentCommand = AllCommands.commandCheck(txt);
         //
@@ -72,19 +81,19 @@ public class CommandWork
     // shows general random answer for user
     private void showText()
     {
-        textShower.outputConsole(file.readFile(FileWork.READ_RANDOM_STRING));
+        textShower.setOuputText(file.readFile(FileWork.READ_RANDOM_STRING));
     }
 
     // shows "welcome" string (on startup only)
     private void showWelcome()
     {
-        textShower.outputConsole(file.readFile(FileWork.READ_WELCOME));
+        textShower.setOuputText(file.readFile(FileWork.READ_WELCOME));
     }
 
     // answer for empty input
     private void stringIsEmpty()
     {
-        textShower.outputConsole(CommandWork.STRING_IS_EMPTY);
+        textShower.setOuputText(CommandWork.STRING_IS_EMPTY);
     }
 
     // show help: commands and description
@@ -92,19 +101,19 @@ public class CommandWork
     {
         Map<String,String> descriptionMap = AllCommands.getCommandsWithDescription();
         //
-        descriptionMap.forEach((k,v) -> textShower.outputConsole(k + "\t\t\t\t" + v));
+        descriptionMap.forEach((k,v) -> textShower.setOuputText(k + "\t\t\t\t" + v));
     }
 
     // shows "goodbye" string (on shutdown only)
     private void closeProgram()
     {
-        textShower.outputConsole(file.readFile(FileWork.READ_GOODBYE));
+        textShower.setOuputText(file.readFile(FileWork.READ_GOODBYE));
     }
 
     // changing current file
     private void changeFile()
     {
         file.chooseNewFile();
-        textShower.outputConsole(CommandWork.ANOTHER_FILE);
+        textShower.setOuputText(CommandWork.ANOTHER_FILE);
     }
 }

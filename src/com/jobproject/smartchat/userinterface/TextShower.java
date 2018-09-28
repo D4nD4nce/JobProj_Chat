@@ -6,7 +6,21 @@ package com.jobproject.smartchat.userinterface;
 
 public class TextShower
 {
-    public void outputConsole(String str)
+    public void setOuputText(String str)
+    {
+        try
+        {
+            if (str == null)
+                throw new NullPointerException("string for output is null");
+        }catch (NullPointerException e)
+        {
+            e.printStackTrace();
+        }
+        //
+        outputConsole(str);
+    }
+
+    private void outputConsole(String str)
     {
         System.out.println(str);
     }

@@ -8,7 +8,12 @@ import java.util.Scanner;
 
 public class GetText
 {
-    public String inputConsole ()
+    public String getInputText()
+    {
+        return inputConsole();
+    }
+
+    private String inputConsole()
     {
         Scanner input = new Scanner(System.in);
         String result;
