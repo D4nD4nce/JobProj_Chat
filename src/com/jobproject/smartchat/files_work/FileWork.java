@@ -8,19 +8,19 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class FileWork
 {
     public static final int READ_RANDOM_STRING      = 1;                // main method, get random string from file
-    public static final int READ_ALL                = 2;                // for tests
+    public static final int READ_ALL                = 2;                // for debug
     public static final int READ_WELCOME            = 3;                // for first "welcome" string from file
     public static final int READ_GOODBYE            = 4;                // for last "goodbye" string from file
 
-    private AllFiles eFiles;
     private String currentFilePath;                                     // "./bin/general.txt"
     private String currentAnswer;                                       // current randomly chosen string from list
-    private ArrayList<String> lstAnswers;                               // list with all strings from file except first and last
+    private List<String> lstAnswers;                                    // list with all strings from file except first and last
     private String welcomeAnswer;                                       // first line from file
     private String goodbyeAnswer;                                       // last line from file
     private String allFileInfo;                                         // for debug
@@ -36,22 +36,30 @@ public class FileWork
         setCurrentFile(getRandomFilePath());
     }
 
-    // read chosen File
+    // read chosen File depending on flags
     public String readFile(int flag)
     {
-        switch (flag)
+        try
         {
-            case READ_RANDOM_STRING:
-                return readRandom();
-            case READ_ALL:
-                return readAll();
-            case READ_WELCOME:
-                return readWelcome();
-            case READ_GOODBYE:
-                return readGoodbye();
-            default:
-                return "no flag found";
+            switch (flag)
+            {
+                case READ_RANDOM_STRING:
+                    return readRandom();
+                case READ_ALL:
+                    return readAll();
+                case READ_WELCOME:
+                    return readWelcome();
+                case READ_GOODBYE:
+                    return readGoodbye();
+                default:
+                    throw new Exception("wrong flag in read file method");
+            }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
         }
+        //
+        return "";
     }
 
     // get string with path of chosen file witch program reads from
@@ -69,6 +77,15 @@ public class FileWork
     // write string to chosen file
     public void writeToFile(String output, int flag)
     {
+        try
+        {
+            if (output == null)
+                throw new Exception("output string is null");
+        }catch (Exception e1)
+        {
+            e1.printStackTrace();
+        }
+        //
         try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
             Writer out = new BufferedWriter(outputStreamWriter))
@@ -86,6 +103,15 @@ public class FileWork
     // write array to chosen file
     public void writeToFile(ArrayList<String> output, int flag)
     {
+        try
+        {
+            if (output == null)
+                throw new Exception("output array is null");
+        }catch (Exception e1)
+        {
+            e1.printStackTrace();
+        }
+        //
         try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
             Writer out = new BufferedWriter(outputStreamWriter))
@@ -96,13 +122,13 @@ public class FileWork
                 try
                 {
                     out.append(str);
-                } catch (IOException e1)
+                } catch (IOException | NullPointerException e1)
                 {
                     e1.printStackTrace();
                 }
             });
             //
-        } catch (IOException e)
+        } catch (IOException | NullPointerException e)
         {
             e.printStackTrace();
             // ..
@@ -113,7 +139,8 @@ public class FileWork
     private void initialize()
     {
         lstAnswers = new ArrayList<>();
-        currentAnswer = "no answer initialized";
+        currentAnswer = "default answer";
+        //currentFilePath = "default path";
 
         // setting random helping file for answers
         setCurrentFile(getRandomFilePath());
@@ -123,6 +150,7 @@ public class FileWork
     private void setCurrentFile(String filePath)
     {
         currentFilePath = filePath;
+        // reading current file and setting all variables
         readAllIntoArray();
     }
 
@@ -131,9 +159,25 @@ public class FileWork
     {
         Random rand = new Random();
         AllFiles files[] = AllFiles.values();
+
         int lengh = files.length;
 
-        return files[rand.nextInt(lengh-1)].getDescription();
+        String currentPath = getCurrentFilePath();                                      // get current path
+        String newPath = files[rand.nextInt(lengh-1)].getDescription();         // get new path
+        //
+        // check for new path, get another if it's the same
+        if (currentPath != null && !currentPath.isEmpty())
+        {
+            while(currentPath.compareTo(newPath) == 0)
+            {
+                newPath = files[rand.nextInt(lengh-1)].getDescription();
+            }
+        } else
+        {
+            newPath = files[rand.nextInt(lengh-1)].getDescription();
+        }
+        //
+        return newPath;
     }
 
     // read all from file, adding answers into current fields
@@ -146,7 +190,7 @@ public class FileWork
             Reader reader = new BufferedReader(inputStreamReader))
         {
             int ch;
-            ArrayList<String> allAnswers = new ArrayList<>();
+            ArrayList<String> allAnswers;
 
             // getting massive with all strings from file
             while ((ch = reader.read()) > -1)
@@ -172,6 +216,9 @@ public class FileWork
 
             // get size of answers mass
             int currentMassSize = allAnswers.size();
+
+            // clear answers from previous file
+            lstAnswers.clear();
 
             // get general answers from gotten massive
             for(int i = 1; i < currentMassSize-1; i++)
