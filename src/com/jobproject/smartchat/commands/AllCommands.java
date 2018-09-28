@@ -17,11 +17,14 @@ public enum AllCommands
     SHOW_HELP;                      // show available commands
 
     // static map with all commands: input key, enum value, description
-    private static final Map<String,CommandsDescription> commandsMap = Map.ofEntries(
-            Map.entry("/close", new CommandsDescription(CLOSE_CHAT, "close program")),
-            Map.entry("/change", new CommandsDescription(CHANGE_FILE, "choose another file to get answers")),
-            Map.entry("/help", new CommandsDescription(SHOW_HELP, "get all commands description"))
-    );
+    private static final Map<String,CommandsDescription> commandsMap;
+    static
+    {
+       commandsMap = new HashMap<>();
+       commandsMap.put("/close", new CommandsDescription(CLOSE_CHAT, "close program"));
+       commandsMap.put("/change", new CommandsDescription(CHANGE_FILE, "choose another file to get answers"));
+       commandsMap.put("/help", new CommandsDescription(SHOW_HELP, "get all commands description"));
+    }
 
     // checking input for having command
     public static AllCommands commandCheck(String txt)
