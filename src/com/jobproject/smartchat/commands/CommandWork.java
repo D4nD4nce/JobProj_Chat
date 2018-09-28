@@ -1,4 +1,4 @@
-package com.jobproject.smartchat;
+package com.jobproject.smartchat.commands;
 
 /*
  * Class works with general logic, gets and executes user commands
@@ -7,18 +7,19 @@ package com.jobproject.smartchat;
 import com.jobproject.smartchat.files_work.FileWork;
 import com.jobproject.smartchat.userinterface.TextShower;
 
-public class Commands {
+import java.util.Map;
 
-    public static final int NO_COMMANDS_FOUND       = 0;        // no special commands, return random answer
-    public static final int CHANGE_FILE             = 1;        // change helping file with answers
-    public static final int CLOSE_CHAT              = 2;        // shutdown program
+public class CommandWork
+{
+    private static final String STRING_IS_EMPTY         = "ur message is empty, please, type something else";
+    private static final String ANOTHER_FILE            = "new file chosen";
 
     private String userText;
     private FileWork file;
-    private int currentCommand;
+    private AllCommands currentCommand;
     private TextShower textShower;
 
-    public Commands()
+    public CommandWork()
     {
         // initializing current file
         file = new FileWork();
@@ -28,24 +29,11 @@ public class Commands {
         showWelcome();
     }
 
-    // checking input for having command
-    public static int commandCheck(String txt)
-    {
-        switch (txt)
-        {
-            case "/close":
-                return CLOSE_CHAT;
-            case "/change":
-                return CHANGE_FILE;
-        }
-        return NO_COMMANDS_FOUND;
-    }
-
     // general answer for user, return false on shutdown command
     public boolean answer(String txt)
     {
         this.userText = txt;
-        this.currentCommand = Commands.commandCheck(txt);
+        this.currentCommand = AllCommands.commandCheck(txt);
         //
         switch (currentCommand)
         {
@@ -55,11 +43,17 @@ public class Commands {
             case CHANGE_FILE:
                 this.changeFile();
                 break;
+            case EMPTY_STRING:
+                this.stringIsEmpty();
+                break;
+            case SHOW_HELP:
+                this.showHelp();
+                break;
             case CLOSE_CHAT:
                 this.closeProgram();
                 return false;
         }
-
+        //
         return true;
     }
 
@@ -70,12 +64,12 @@ public class Commands {
     }
 
     // get current command if it exists
-    public int getCurrentCommand()
+    public AllCommands getCurrentCommand()
     {
         return currentCommand;
     }
 
-    // shows general answer for user
+    // shows general random answer for user
     private void showText()
     {
         textShower.outputConsole(file.readFile(FileWork.READ_RANDOM_STRING));
@@ -87,7 +81,21 @@ public class Commands {
         textShower.outputConsole(file.readFile(FileWork.READ_WELCOME));
     }
 
-    // shows "goodbye" string
+    // answer for empty input
+    private void stringIsEmpty()
+    {
+        textShower.outputConsole(CommandWork.STRING_IS_EMPTY);
+    }
+
+    // show help: commands and description
+    private void showHelp()
+    {
+        Map<String,String> descriptionMap = AllCommands.getCommandsWithDescription();
+        //
+        descriptionMap.forEach((k,v) -> textShower.outputConsole(k + "\t\t\t\t" + v));
+    }
+
+    // shows "goodbye" string (on shutdown only)
     private void closeProgram()
     {
         textShower.outputConsole(file.readFile(FileWork.READ_GOODBYE));
@@ -97,6 +105,6 @@ public class Commands {
     private void changeFile()
     {
         file.chooseNewFile();
-        textShower.outputConsole("file chosen");
+        textShower.outputConsole(CommandWork.ANOTHER_FILE);
     }
 }

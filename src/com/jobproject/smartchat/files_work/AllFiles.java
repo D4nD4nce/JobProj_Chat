@@ -1,5 +1,9 @@
 package com.jobproject.smartchat.files_work;
 
+/*
+*
+ */
+
 public enum AllFiles
 {
     FIRST_FILE("./bin/general.txt"),
@@ -9,9 +13,13 @@ public enum AllFiles
 
     private String description;
 
-    private AllFiles(String description) {
+    AllFiles(String description)
+    {
         this.description = description;
     }
 
-    public String getDescription() {return description;}
+    public String getDescription()
+    {
+        return description;
+    }
 }
