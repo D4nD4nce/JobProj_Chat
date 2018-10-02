@@ -31,29 +31,31 @@ public class CommandWork {
 
     // general answer for user, return false on shutdown command
     public boolean answer(String txt) {
-        if (txt == null)
+        if (txt == null){
             return false;
+        }
         this.userText = txt;
         this.currentCommand = AllCommands.commandCheck(txt);
-        //
-        switch (currentCommand) {
-            case NO_COMMANDS_FOUND:
-                this.showText();
-                break;
-            case CHANGE_FILE:
-                this.changeFile();
-                break;
-            case EMPTY_STRING:
-                this.stringIsEmpty();
-                break;
-            case SHOW_HELP:
-                this.showHelp();
-                break;
-            case CLOSE_CHAT:
-                this.closeProgram();
-                return false;
+        if (currentCommand != null){
+            switch (currentCommand) {
+                case NO_COMMANDS_FOUND:
+                    this.showText();
+                    return true;
+                case CHANGE_FILE:
+                    this.changeFile();
+                    return true;
+                case EMPTY_STRING:
+                    this.stringIsEmpty();
+                    return true;
+                case SHOW_HELP:
+                    this.showHelp();
+                    return true;
+                case CLOSE_CHAT:
+                    this.closeProgram();
+                    break;
+            }
         }
-        return true;
+        return false;
     }
 
     // shows general random answer for user

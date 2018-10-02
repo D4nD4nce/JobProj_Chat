@@ -33,8 +33,9 @@ public enum AllCommands {
 
     // checking input for having command
     public static AllCommands commandCheck(String txt) {
-        if (txt == null || txt.isEmpty())
+        if (txt == null || txt.isEmpty()){
             return EMPTY_STRING;
+        }
         if(commandsMap.containsKey(txt)) {
             return commandsMap.get(txt).getCommandValue();
         } else {

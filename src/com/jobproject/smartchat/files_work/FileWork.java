@@ -87,8 +87,9 @@ public class FileWork {
                 this.welcomeAnswer = FileWork.DEFAULT_WELCOME;
                 this.goodbyeAnswer = FileWork.DEFAULT_GOODBYE;
             } else {
-                for(int i = 1; i < currentMassSize-1; i++)
+                for(int i = 1; i < currentMassSize-1; i++){
                     lstAnswers.add(allAnswers.get(i));                                  // get general answers from gotten massive
+                }
                 this.welcomeAnswer = allAnswers.get(0);                                 // get first and last lines from gotten massive
                 this.goodbyeAnswer = allAnswers.get(currentMassSize-1);
             }
