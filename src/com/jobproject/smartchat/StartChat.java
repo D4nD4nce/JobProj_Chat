@@ -3,22 +3,14 @@ package com.jobproject.smartchat;
 import com.jobproject.smartchat.commands.CommandWork;
 import com.jobproject.smartchat.userinterface.GetText;
 
-public class StartChat
-{
-    public static void main (String args[])
-    {
+public class StartChat {
+    public static void main (String args[]) {
         boolean flag = true;
-        // class to get user input
-        GetText getText = new GetText();
-        // class to interpret user commands and execute them
-        CommandWork comWork = new CommandWork();
+        GetText getText = new GetText();                    // class to get user input
+        CommandWork comWork = new CommandWork();            // class to interpret user commands and execute them
 
-        // take input in cycle while user writes anything until activating shutdown command
-        while(flag)
-        {
-            flag = comWork.answer(getText.getInputText());
+        while(flag){
+            flag = comWork.answer(getText.getInputText());  // take input in cycle while user writes anything until activating shutdown command
         }
-
-        //file.writeToFile("some text to input", 0);
     }
 }
