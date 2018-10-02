@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Random;
 
 public class FileWork {
+    public static final String DEFAULT_ANSWER       = "default answer";
+    public static final String DEFAULT_WELCOME      = "default welcome";
+    public static final String DEFAULT_GOODBYE      = "default goodbye";
+
     public static final int READ_RANDOM_STRING      = 1;                // main method, get random string from file
     public static final int READ_ALL                = 2;                // for debug
     public static final int READ_WELCOME            = 3;                // for first "welcome" string from file
@@ -76,18 +80,18 @@ public class FileWork {
             }
             allFileInfo = stringBufferAll.toString();                                   // get all info from file into class field
             allAnswers = new ArrayList<>(Arrays.asList(allFileInfo.split("\n"))); // splitting gotten string into list
-            try {
-                if (allAnswers.size() < 3)
-                    throw new Exception("there are not enough lines with answers");     // check gotten massive: first line, last line and at list one answer
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-            int currentMassSize = allAnswers.size();                                    // get size of answers mass
             lstAnswers.clear();                                                         // clear answers from previous file
-            for(int i = 1; i < currentMassSize-1; i++)
-                lstAnswers.add(allAnswers.get(i));                                      // get general answers from gotten massive
-            this.welcomeAnswer = allAnswers.get(0);                                     // get first and last lines from gotten massive
-            this.goodbyeAnswer = allAnswers.get(currentMassSize-1);
+            int currentMassSize = allAnswers.size();                                    // get size of answers mass
+            if (currentMassSize < 3){
+                lstAnswers.add(FileWork.DEFAULT_ANSWER);                                // set defaults in case there're a problem with file
+                this.welcomeAnswer = FileWork.DEFAULT_WELCOME;
+                this.goodbyeAnswer = FileWork.DEFAULT_GOODBYE;
+            } else {
+                for(int i = 1; i < currentMassSize-1; i++)
+                    lstAnswers.add(allAnswers.get(i));                                  // get general answers from gotten massive
+                this.welcomeAnswer = allAnswers.get(0);                                 // get first and last lines from gotten massive
+                this.goodbyeAnswer = allAnswers.get(currentMassSize-1);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
