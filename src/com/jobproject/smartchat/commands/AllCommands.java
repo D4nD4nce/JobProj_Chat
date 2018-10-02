@@ -36,11 +36,7 @@ public enum AllCommands {
         if (txt == null || txt.isEmpty()){
             return EMPTY_STRING;
         }
-        if(commandsMap.containsKey(txt)) {
-            return commandsMap.get(txt).getCommandValue();
-        } else {
-            return NO_COMMANDS_FOUND;
-        }
+        return (commandsMap.containsKey(txt)) ? commandsMap.get(txt).getCommandValue() : NO_COMMANDS_FOUND;
     }
 
     // static nested class encapsulates commands with descriptions

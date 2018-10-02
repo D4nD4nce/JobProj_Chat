@@ -53,6 +53,8 @@ public class CommandWork {
                 case CLOSE_CHAT:
                     this.closeProgram();
                     break;
+                default:
+                    return false;
             }
         }
         return false;

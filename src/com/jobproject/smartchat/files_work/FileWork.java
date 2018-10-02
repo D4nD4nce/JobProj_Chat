@@ -12,14 +12,15 @@ import java.util.List;
 import java.util.Random;
 
 public class FileWork {
-    public static final String DEFAULT_ANSWER       = "default answer";
-    public static final String DEFAULT_WELCOME      = "default welcome";
-    public static final String DEFAULT_GOODBYE      = "default goodbye";
-
     public static final int READ_RANDOM_STRING      = 1;                // main method, get random string from file
     public static final int READ_ALL                = 2;                // for debug
     public static final int READ_WELCOME            = 3;                // for first "welcome" string from file
     public static final int READ_GOODBYE            = 4;                // for last "goodbye" string from file
+
+    private static final String DEFAULT_ANSWER       = "default answer";
+    private static final String DEFAULT_WELCOME      = "default welcome";
+    private static final String DEFAULT_GOODBYE      = "default goodbye";
+    private static final int MIN_FILE_LINES_COUNT    = 3;
 
     private String currentFilePath;                                     // "./bin/general.txt"
     private String currentAnswer;                                       // current randomly chosen string from list
@@ -70,28 +71,31 @@ public class FileWork {
     // read all from file, adding answers into current fields
     private void readAllIntoArray() {
         StringBuffer stringBufferAll = new StringBuffer();
+
         try(FileInputStream myFile = new FileInputStream(currentFilePath);
             InputStreamReader inputStreamReader = new InputStreamReader(myFile, StandardCharsets.UTF_8);
             Reader reader = new BufferedReader(inputStreamReader)) {
-            int oneCharCode;
-            ArrayList<String> allAnswers;
+            int oneCharCode;                                                            // code of reading chars
+            ArrayList<String> allAnswers;                                               // all found lines in new file
+            int allAnswersMassSize;
+
             while ((oneCharCode = reader.read()) > -1) {
-                stringBufferAll.append((char)oneCharCode);                              // getting massive with all strings from file
+                stringBufferAll.append((char) oneCharCode);                              // getting massive with all strings from file
             }
             allFileInfo = stringBufferAll.toString();                                   // get all info from file into class field
             allAnswers = new ArrayList<>(Arrays.asList(allFileInfo.split("\n"))); // splitting gotten string into list
-            lstAnswers.clear();                                                         // clear answers from previous file
-            int currentMassSize = allAnswers.size();                                    // get size of answers mass
-            if (currentMassSize < 3){
-                lstAnswers.add(FileWork.DEFAULT_ANSWER);                                // set defaults in case there're a problem with file
+            allAnswersMassSize = allAnswers.size();                                     // get size of answers mass
+            this.lstAnswers.clear();                                                    // clear answers from previous file
+            if (allAnswersMassSize < FileWork.MIN_FILE_LINES_COUNT){
+                this.lstAnswers.add(FileWork.DEFAULT_ANSWER);                           // set defaults in case there're a problem with file
                 this.welcomeAnswer = FileWork.DEFAULT_WELCOME;
                 this.goodbyeAnswer = FileWork.DEFAULT_GOODBYE;
             } else {
-                for(int i = 1; i < currentMassSize-1; i++){
-                    lstAnswers.add(allAnswers.get(i));                                  // get general answers from gotten massive
+                for(int i = 1; i < allAnswersMassSize-1; i++){
+                    this.lstAnswers.add(allAnswers.get(i));                             // get general answers from gotten massive
                 }
                 this.welcomeAnswer = allAnswers.get(0);                                 // get first and last lines from gotten massive
-                this.goodbyeAnswer = allAnswers.get(currentMassSize-1);
+                this.goodbyeAnswer = allAnswers.get(allAnswersMassSize-1);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,8 +123,9 @@ public class FileWork {
                 return readWelcome();
             case READ_GOODBYE:
                 return readGoodbye();
+            default:
+                return "";
         }
-        return "";
     }
 
     // general - get random string from chosen file
