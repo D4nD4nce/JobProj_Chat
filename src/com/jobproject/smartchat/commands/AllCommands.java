@@ -24,24 +24,22 @@ public enum AllCommands {
        commandsMap.put("/help", new CommandsDescription(SHOW_HELP, "get all commands description"));
     }
 
+    // get all commands with description
+    public static Map<String,String> getCommandsWithDescription() {
+        Map<String,String> result = new HashMap<>();
+        commandsMap.forEach((k,v) -> result.put(k,v.getCommandDescription()));
+        return result;
+    }
+
     // checking input for having command
     public static AllCommands commandCheck(String txt) {
-        if (txt == null)
-            return null;
-        if (txt.isEmpty())
+        if (txt == null || txt.isEmpty())
             return EMPTY_STRING;
         if(commandsMap.containsKey(txt)) {
             return commandsMap.get(txt).getCommandValue();
         } else {
             return NO_COMMANDS_FOUND;
         }
-    }
-
-    // get all commands with description
-    public static Map<String,String> getCommandsWithDescription() {
-        Map<String,String> result = new HashMap<>();
-        commandsMap.forEach((k,v) -> result.put(k,v.getCommandDescription()));
-        return result;
     }
 
     // static nested class encapsulates commands with descriptions

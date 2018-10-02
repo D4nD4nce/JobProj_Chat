@@ -24,6 +24,11 @@ public class CommandWork {
         showWelcome();                          // showing "welcome" message
     }
 
+    // shows "welcome" string (on startup only)
+    private void showWelcome() {
+        textShower.setOuputText(file.readFile(FileWork.READ_WELCOME));
+    }
+
     // general answer for user, return false on shutdown command
     public boolean answer(String txt) {
         if (txt == null)
@@ -51,24 +56,15 @@ public class CommandWork {
         return true;
     }
 
-    // get text user wrote
-    public String getUserText() {
-        return userText;
-    }
-
-    // get current command if it exists
-    public AllCommands getCurrentCommand() {
-        return currentCommand;
-    }
-
     // shows general random answer for user
     private void showText() {
         textShower.setOuputText(file.readFile(FileWork.READ_RANDOM_STRING));
     }
 
-    // shows "welcome" string (on startup only)
-    private void showWelcome() {
-        textShower.setOuputText(file.readFile(FileWork.READ_WELCOME));
+    // changing current file
+    private void changeFile() {
+        file.chooseNewFile();
+        textShower.setOuputText(CommandWork.ANOTHER_FILE);
     }
 
     // answer for empty input
@@ -87,9 +83,13 @@ public class CommandWork {
         textShower.setOuputText(file.readFile(FileWork.READ_GOODBYE));
     }
 
-    // changing current file
-    private void changeFile() {
-        file.chooseNewFile();
-        textShower.setOuputText(CommandWork.ANOTHER_FILE);
+    // get text user wrote
+    public String getUserText() {
+        return userText;
+    }
+
+    // get current command if it exists
+    public AllCommands getCurrentCommand() {
+        return currentCommand;
     }
 }
