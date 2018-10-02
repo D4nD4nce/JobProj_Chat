@@ -11,8 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class FileWork
-{
+public class FileWork {
     public static final int READ_RANDOM_STRING      = 1;                // main method, get random string from file
     public static final int READ_ALL                = 2;                // for debug
     public static final int READ_WELCOME            = 3;                // for first "welcome" string from file
@@ -25,237 +24,153 @@ public class FileWork
     private String goodbyeAnswer;                                       // last line from file
     private String allFileInfo;                                         // for debug
 
-    public FileWork()
-    {
+    public FileWork() {
         initialize();
     }
 
     // choosing new random helping file for user answers
-    public void chooseNewFile()
-    {
+    public void chooseNewFile() {
         setCurrentFile(getRandomFilePath());
     }
 
     // read chosen File depending on flags
-    public String readFile(int flag)
-    {
-        try
-        {
-            switch (flag)
-            {
-                case READ_RANDOM_STRING:
-                    return readRandom();
-                case READ_ALL:
-                    return readAll();
-                case READ_WELCOME:
-                    return readWelcome();
-                case READ_GOODBYE:
-                    return readGoodbye();
-                default:
-                    throw new Exception("wrong flag in read file method");
-            }
-        }catch (Exception e)
-        {
-            e.printStackTrace();
+    public String readFile(int flag) {
+        switch (flag) {
+            case READ_RANDOM_STRING:
+                return readRandom();
+            case READ_ALL:
+                return readAll();
+            case READ_WELCOME:
+                return readWelcome();
+            case READ_GOODBYE:
+                return readGoodbye();
+            default:
+                //
         }
-        //
         return "";
     }
 
     // get string with path of chosen file witch program reads from
-    public String getCurrentFilePath()
-    {
+    public String getCurrentFilePath() {
         return currentFilePath;
     }
 
     // get current variable marked as answer
-    public String getCurrentAnswer()
-    {
+    public String getCurrentAnswer() {
         return currentAnswer;
     }
 
     // write string to chosen file
-    public void writeToFile(String output, int flag)
-    {
-        try
-        {
-            if (output == null)
-                throw new Exception("output string is null");
-        }catch (Exception e1)
-        {
-            e1.printStackTrace();
-        }
-        //
+    public void writeToFile(String output, int flag) {
+        if (output == null)
+            return;
         try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
-            Writer out = new BufferedWriter(outputStreamWriter))
-        {
-            //String myAddress = "my address is here";
+            Writer out = new BufferedWriter(outputStreamWriter)) {
             out.write(output);
-
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
-            // ..
         }
     }
 
     // write array to chosen file
-    public void writeToFile(ArrayList<String> output, int flag)
-    {
-        try
-        {
-            if (output == null)
-                throw new Exception("output array is null");
-        }catch (Exception e1)
-        {
-            e1.printStackTrace();
-        }
-        //
+    public void writeToFile(ArrayList<String> output, int flag) {
+        if (output == null)
+            return;
         try(FileOutputStream myFile = new FileOutputStream(currentFilePath);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(myFile, StandardCharsets.UTF_8);
-            Writer out = new BufferedWriter(outputStreamWriter))
-        {
-            //String myAddress = "my address is here";
-            output.forEach((str) ->
-            {
-                try
-                {
+            Writer out = new BufferedWriter(outputStreamWriter)) {
+            output.forEach((str) -> {
+                try {
                     out.append(str);
-                } catch (IOException | NullPointerException e1)
-                {
+                } catch (IOException | NullPointerException e1) {
                     e1.printStackTrace();
                 }
             });
-            //
-        } catch (IOException | NullPointerException e)
-        {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
-            // ..
         }
     }
 
     // initializing globals, reading current file
-    private void initialize()
-    {
+    private void initialize() {
         lstAnswers = new ArrayList<>();
         currentAnswer = "default answer";
-        //currentFilePath = "default path";
-
-        // setting random helping file for answers
-        setCurrentFile(getRandomFilePath());
+        setCurrentFile(getRandomFilePath());                                            // setting random helping file for answers
     }
 
     // choosing path for file to read from
-    private void setCurrentFile(String filePath)
-    {
+    private void setCurrentFile(String filePath) {
         currentFilePath = filePath;
-        // reading current file and setting all variables
-        readAllIntoArray();
+        readAllIntoArray();                                                             // reading current file and setting all variables
     }
 
     // getting random path for helping user file
-    private String getRandomFilePath()
-    {
+    private String getRandomFilePath() {
         Random rand = new Random();
         AllFiles files[] = AllFiles.values();
-
         int lengh = files.length;
-
         String currentPath = getCurrentFilePath();                                      // get current path
         String newPath = files[rand.nextInt(lengh-1)].getDescription();         // get new path
-        //
         // check for new path, get another if it's the same
-        if (currentPath != null && !currentPath.isEmpty())
-        {
-            while(currentPath.compareTo(newPath) == 0)
-            {
+        if (currentPath != null && !currentPath.isEmpty()) {
+            while(currentPath.compareTo(newPath) == 0) {
                 newPath = files[rand.nextInt(lengh-1)].getDescription();
             }
-        } else
-        {
+        } else {
             newPath = files[rand.nextInt(lengh-1)].getDescription();
         }
-        //
         return newPath;
     }
 
     // read all from file, adding answers into current fields
-    private void readAllIntoArray()
-    {
+    private void readAllIntoArray() {
         StringBuffer stringBufferAll = new StringBuffer();
-        //
         try(FileInputStream myFile = new FileInputStream(currentFilePath);
             InputStreamReader inputStreamReader = new InputStreamReader(myFile, StandardCharsets.UTF_8);
-            Reader reader = new BufferedReader(inputStreamReader))
-        {
-            int ch;
+            Reader reader = new BufferedReader(inputStreamReader)) {
+            int oneCharCode;
             ArrayList<String> allAnswers;
-
-            // getting massive with all strings from file
-            while ((ch = reader.read()) > -1)
-            {
-                stringBufferAll.append((char)ch);
+            while ((oneCharCode = reader.read()) > -1) {
+                stringBufferAll.append((char)oneCharCode);                                  // getting massive with all strings from file
             }
-            //
-            // get all info from file into class field
-            allFileInfo = stringBufferAll.toString();
-
-            // splitting gotten string into list
-            allAnswers = new ArrayList<>(Arrays.asList(allFileInfo.split("\n")));
-
-            // check gotten massive: first line, last line and at list one answer
-            try
-            {
+            allFileInfo = stringBufferAll.toString();                                       // get all info from file into class field
+            allAnswers = new ArrayList<>(Arrays.asList(allFileInfo.split("\n")));    // splitting gotten string into list
+            try {
                 if (allAnswers.size() < 3)
-                    throw new Exception("there are not enough lines with answers in current file");
-            } catch (Exception e2)
-            {
+                    throw new Exception("there are not enough lines with answers in current file"); // check gotten massive: first line, last line and at list one answer
+            } catch (Exception e2) {
                 e2.printStackTrace();
             }
-
-            // get size of answers mass
-            int currentMassSize = allAnswers.size();
-
-            // clear answers from previous file
-            lstAnswers.clear();
-
-            // get general answers from gotten massive
+            int currentMassSize = allAnswers.size();                                        // get size of answers mass
+            lstAnswers.clear();                                                             // clear answers from previous file
             for(int i = 1; i < currentMassSize-1; i++)
-                lstAnswers.add(allAnswers.get(i));
-
-            // get first and last lines from gotten massive
-            this.welcomeAnswer = allAnswers.get(0);
+                lstAnswers.add(allAnswers.get(i));                                          // get general answers from gotten massive
+            this.welcomeAnswer = allAnswers.get(0);                                         // get first and last lines from gotten massive
             this.goodbyeAnswer = allAnswers.get(currentMassSize-1);
-
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     // general - get random string from chosen file
-    private String readRandom()
-    {
+    private String readRandom() {
         Random rand = new Random();
         return currentAnswer = lstAnswers.get(rand.nextInt(lstAnswers.size()));
     }
 
     // returns all info from file (debug)
-    private String readAll()
-    {
+    private String readAll() {
         return allFileInfo;
     }
 
     // returns the first line in file
-    private String readWelcome()
-    {
+    private String readWelcome() {
         return welcomeAnswer;
     }
 
     // returns the last line in file
-    private String readGoodbye()
-    {
+    private String readGoodbye() {
         return goodbyeAnswer;
     }
 }

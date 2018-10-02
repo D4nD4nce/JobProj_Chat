@@ -9,8 +9,7 @@ import com.jobproject.smartchat.userinterface.TextShower;
 
 import java.util.Map;
 
-public class CommandWork
-{
+public class CommandWork {
     private static final String STRING_IS_EMPTY         = "ur message is empty, please, type something else";
     private static final String ANOTHER_FILE            = "new file chosen";
 
@@ -19,33 +18,20 @@ public class CommandWork
     private AllCommands currentCommand;
     private TextShower textShower;
 
-    public CommandWork()
-    {
-        // initializing current file
-        file = new FileWork();
+    public CommandWork() {
+        file = new FileWork();                  // initializing current file
         textShower = new TextShower();
-
-        // showing "welcome" message
-        showWelcome();
+        showWelcome();                          // showing "welcome" message
     }
 
     // general answer for user, return false on shutdown command
-    public boolean answer(String txt)
-    {
-        try
-        {
-            if (txt == null)
-                throw new NullPointerException("got string is null");
-        }catch (NullPointerException eNull)
-        {
-            eNull.printStackTrace();
-        }
-        //
+    public boolean answer(String txt) {
+        if (txt == null)
+            return false;
         this.userText = txt;
         this.currentCommand = AllCommands.commandCheck(txt);
         //
-        switch (currentCommand)
-        {
+        switch (currentCommand) {
             case NO_COMMANDS_FOUND:
                 this.showText();
                 break;
@@ -62,57 +48,47 @@ public class CommandWork
                 this.closeProgram();
                 return false;
         }
-        //
         return true;
     }
 
     // get text user wrote
-    public String getUserText()
-    {
+    public String getUserText() {
         return userText;
     }
 
     // get current command if it exists
-    public AllCommands getCurrentCommand()
-    {
+    public AllCommands getCurrentCommand() {
         return currentCommand;
     }
 
     // shows general random answer for user
-    private void showText()
-    {
+    private void showText() {
         textShower.setOuputText(file.readFile(FileWork.READ_RANDOM_STRING));
     }
 
     // shows "welcome" string (on startup only)
-    private void showWelcome()
-    {
+    private void showWelcome() {
         textShower.setOuputText(file.readFile(FileWork.READ_WELCOME));
     }
 
     // answer for empty input
-    private void stringIsEmpty()
-    {
+    private void stringIsEmpty() {
         textShower.setOuputText(CommandWork.STRING_IS_EMPTY);
     }
 
     // show help: commands and description
-    private void showHelp()
-    {
+    private void showHelp() {
         Map<String,String> descriptionMap = AllCommands.getCommandsWithDescription();
-        //
         descriptionMap.forEach((k,v) -> textShower.setOuputText(k + "\t\t\t\t" + v));
     }
 
     // shows "goodbye" string (on shutdown only)
-    private void closeProgram()
-    {
+    private void closeProgram() {
         textShower.setOuputText(file.readFile(FileWork.READ_GOODBYE));
     }
 
     // changing current file
-    private void changeFile()
-    {
+    private void changeFile() {
         file.chooseNewFile();
         textShower.setOuputText(CommandWork.ANOTHER_FILE);
     }
