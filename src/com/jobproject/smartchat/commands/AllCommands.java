@@ -10,7 +10,7 @@ import java.util.Map;
 
 public enum AllCommands {
     NO_COMMANDS_FOUND,              // no special commands, return random answer
-    CHANGE_FILE,                    // change helping file with answers
+    CHANGE_ANSWERS,                 // change a place where answers are read from
     CLOSE_CHAT,                     // shutdown program
     EMPTY_STRING,                   // no text
     SHOW_HELP;                      // show available commands
@@ -20,7 +20,7 @@ public enum AllCommands {
     static {
        commandsMap = new HashMap<>();
        commandsMap.put("/close", new CommandsDescription(CLOSE_CHAT, "close program"));
-       commandsMap.put("/change", new CommandsDescription(CHANGE_FILE, "choose another file to get answers"));
+       commandsMap.put("/change", new CommandsDescription(CHANGE_ANSWERS, "choose another file to get answers"));
        commandsMap.put("/help", new CommandsDescription(SHOW_HELP, "get all commands description"));
     }
 

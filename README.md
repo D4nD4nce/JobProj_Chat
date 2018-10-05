@@ -1,5 +1,24 @@
 # JobProj_Chat
-Simple desctop app.
+Desktop chat application.
+
+Current list of commands:
+- /change
+- /help
+- /close
+
+VERSION 2.0
+
+Add:
+1. H2DB instead of working with files
+
+TODO:
+1. Отдельный компонент, отвечающий за DB, вместо FileWork
+2. Проверить, что FileWork используется только как класс, и не связан с другими классами
+3. Удалить FileWork, полностью интегрировать работу с DB
+
+//==//==//==//==//==//==//==//==
+
+VERSION 1.0
 
 Chat application that works using console and supportive files. After writing any text in console program should answer using any text from helping file.
 
