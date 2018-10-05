@@ -4,7 +4,7 @@ package com.jobproject.smartchat.commands;
  * Class works with general logic, gets and executes user commands
  * */
 
-import com.jobproject.smartchat.files_work.FileWork;
+import com.jobproject.smartchat.db_work.DataBase;
 import com.jobproject.smartchat.userinterface.TextShower;
 
 import java.util.Map;
@@ -14,19 +14,19 @@ public class CommandWork {
     private static final String ANOTHER_FILE            = "new file chosen";
 
     private String userText;
-    private FileWork file;
+    private DataBase baseDB;
     private AllCommands currentCommand;
     private TextShower textShower;
 
     public CommandWork() {
-        file = new FileWork();                  // initializing current file
+        baseDB = new DataBase();                    // initializing current file
         textShower = new TextShower();
-        showWelcome();                          // showing "welcome" message
+        showWelcome();                              // showing "welcome" message
     }
 
     // shows "welcome" string (on startup only)
     private void showWelcome() {
-        textShower.setOuputText(file.readFile(FileWork.READ_WELCOME));
+        textShower.setOutputText(baseDB.getAnswer(DataBase.READ_WELCOME));
     }
 
     // general answer for user, return false on shutdown command
@@ -41,8 +41,8 @@ public class CommandWork {
                 case NO_COMMANDS_FOUND:
                     this.showText();
                     return true;
-                case CHANGE_FILE:
-                    this.changeFile();
+                case CHANGE_ANSWERS:
+                    this.changeAnswers();
                     return true;
                 case EMPTY_STRING:
                     this.stringIsEmpty();
@@ -62,29 +62,29 @@ public class CommandWork {
 
     // shows general random answer for user
     private void showText() {
-        textShower.setOuputText(file.readFile(FileWork.READ_RANDOM_STRING));
+        textShower.setOutputText(baseDB.getAnswer(DataBase.READ_RANDOM_STRING));
     }
 
-    // changing current file
-    private void changeFile() {
-        file.chooseNewFile();
-        textShower.setOuputText(CommandWork.ANOTHER_FILE);
+    // changing place where answers are read from
+    private void changeAnswers() {
+        baseDB.chooseNewTable();
+        textShower.setOutputText(CommandWork.ANOTHER_FILE);
     }
 
     // answer for empty input
     private void stringIsEmpty() {
-        textShower.setOuputText(CommandWork.STRING_IS_EMPTY);
+        textShower.setOutputText(CommandWork.STRING_IS_EMPTY);
     }
 
     // show help: commands and description
     private void showHelp() {
         Map<String,String> descriptionMap = AllCommands.getCommandsWithDescription();
-        descriptionMap.forEach((k,v) -> textShower.setOuputText(k + "\t\t\t\t" + v));
+        descriptionMap.forEach((k,v) -> textShower.setOutputText(k + "\t\t\t\t" + v));
     }
 
     // shows "goodbye" string (on shutdown only)
     private void closeProgram() {
-        textShower.setOuputText(file.readFile(FileWork.READ_GOODBYE));
+        textShower.setOutputText(baseDB.getAnswer(DataBase.READ_GOODBYE));
     }
 
     // get text user wrote
