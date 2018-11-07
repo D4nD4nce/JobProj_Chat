@@ -1,4 +1,4 @@
-package com.jobproject.smartchat.commands;
+package commands;
 
 /*
 * general enum class for all special commands in program

@@ -1,4 +1,4 @@
-package com.jobproject.smartchat.db_work;
+package db_work;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -103,6 +103,8 @@ public class DataBase {
                 }
                 resultSet.next();
             }
+            //statement.close();
+            //resultSet.close();
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
         }
@@ -121,6 +123,7 @@ public class DataBase {
             case READ_WELCOME:
                 return readWelcome();
             case READ_GOODBYE:
+                closeConnection();
                 return readGoodbye();
             default:
                 return "";
