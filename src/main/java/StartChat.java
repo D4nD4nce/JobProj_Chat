@@ -1,7 +1,5 @@
-package com.jobproject.smartchat;
-
-import com.jobproject.smartchat.commands.CommandWork;
-import com.jobproject.smartchat.userinterface.GetText;
+import commands.CommandWork;
+import userinterface.GetText;
 
 public class StartChat {
     public static void main (String args[]) {

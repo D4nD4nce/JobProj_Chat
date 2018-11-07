@@ -1,4 +1,4 @@
-package com.jobproject.smartchat.userinterface;
+package userinterface;
 
 /*
  * Class encapsulates work with output for user

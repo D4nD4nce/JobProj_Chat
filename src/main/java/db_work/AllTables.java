@@ -1,4 +1,4 @@
-package com.jobproject.smartchat.db_work;
+package db_work;
 
 import java.util.Random;
 

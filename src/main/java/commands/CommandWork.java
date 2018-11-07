@@ -1,11 +1,11 @@
-package com.jobproject.smartchat.commands;
+package commands;
 
 /*
  * Class works with general logic, gets and executes user commands
  * */
 
-import com.jobproject.smartchat.db_work.DataBase;
-import com.jobproject.smartchat.userinterface.TextShower;
+import db_work.DataBase;
+import userinterface.TextShower;
 
 import java.util.Map;
 
@@ -85,6 +85,7 @@ public class CommandWork {
     // shows "goodbye" string (on shutdown only)
     private void closeProgram() {
         textShower.setOutputText(baseDB.getAnswer(DataBase.READ_GOODBYE));
+
     }
 
     // get text user wrote
