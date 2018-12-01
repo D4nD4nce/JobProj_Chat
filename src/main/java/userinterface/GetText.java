@@ -7,6 +7,7 @@ package userinterface;
 import java.util.Scanner;
 
 public class GetText {
+
     public String getInputText() {
         return inputConsole();
     }
@@ -19,4 +20,5 @@ public class GetText {
         }
         return "";
     }
+
 }
