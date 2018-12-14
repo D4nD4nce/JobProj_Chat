@@ -7,14 +7,14 @@ import java.util.regex.Pattern;
  * general enum for work with user phrases to generate typical "humanLike" answers
  */
 
-public enum Answer {
+public enum Answers {
     NOTHING_FOUND,
     HELLO,
     GOODBYE,
     WHO_ARE_YOU,
     WHERE_ARE_YOU_FROM;
 
-    public static Answer checkLogic(String strUserText) {
+    public static Answers checkLogic(String strUserText) {
         if (strUserText == null || strUserText.isEmpty()) {
             return NOTHING_FOUND;
         }
