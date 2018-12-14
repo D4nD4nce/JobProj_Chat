@@ -11,19 +11,15 @@ import java.util.Map;
 import static database.DBGeneral.*;
 
 public class DBCreator {
-    // flags using for checking what type of any field in table while creating and inserting values
-    private final static int INTEGER_FLAG = 1;
-    private final static int STRING_FLAG = 2;
-
     // static map keeps types of all fields from tables
-    private final static Map<String,Integer> fields_and_types;
+    private final static Map<String,String> fields_and_types;
     static {
         fields_and_types = new HashMap<>();
-        fields_and_types.put(MOODS_FIELD, STRING_FLAG);
-        fields_and_types.put(HI_FIELD, STRING_FLAG);
-        fields_and_types.put(BYBY_FIELD, STRING_FLAG);
-        fields_and_types.put(ANSWERS_FIELD, STRING_FLAG);
-        fields_and_types.put(ID_MOODS_FIELD, INTEGER_FLAG);
+        fields_and_types.put(MOODS_FIELD, FormatSQL.STRING_TYPE);
+        fields_and_types.put(HI_FIELD, FormatSQL.STRING_TYPE);
+        fields_and_types.put(BYBY_FIELD, FormatSQL.STRING_TYPE);
+        fields_and_types.put(ANSWERS_FIELD, FormatSQL.STRING_TYPE);
+        fields_and_types.put(ID_MOODS_FIELD, FormatSQL.INTEGER_TYPE);
     }
 
     private static final String DB_EXTENSION = ".mv.db";                                    // extension for db files
@@ -39,68 +35,35 @@ public class DBCreator {
     public void createAll() {
         FormatSQL formatSQLMoods = new FormatSQL(MOODS_TABLE_NAME, ID_FIELD);               // objects help to form sql strings for creating tables
         FormatSQL formatSQLAnswers = new FormatSQL(ANSWERS_TABLE_NAME, ID_FIELD);
-        String[] moodsTableFields = {MOODS_FIELD, HI_FIELD, BYBY_FIELD};                    // massifs of ordered fields
-        String[] answersTableFields = {ANSWERS_FIELD, ID_MOODS_FIELD};
-        createTable(formatSQLMoods, moodsTableFields);                                      // creating tables
-        createTable(formatSQLAnswers, answersTableFields);
+
+        String[] answersTableFields = {ANSWERS_FIELD, ID_MOODS_FIELD};                      // ordered fields
+        String[] moodsTableFields = {MOODS_FIELD, HI_FIELD, BYBY_FIELD};
+
+        formatSQLMoods.setNewField(MOODS_FIELD, FormatSQL.STRING_TYPE, "NOT NULL");// creating tables
+        formatSQLMoods.setNewField(HI_FIELD, FormatSQL.STRING_TYPE, null);
+        formatSQLMoods.setNewField(BYBY_FIELD, FormatSQL.STRING_TYPE, null);
+        dbConnection.execute(formatSQLMoods.getStringToCreateDB(null));
+
+        formatSQLAnswers.setNewField(ANSWERS_FIELD, FormatSQL.STRING_TYPE, "NOT NULL");
+        formatSQLAnswers.setNewField(ID_MOODS_FIELD, FormatSQL.INTEGER_TYPE, null);
+        String reference = "FOREIGN KEY (" + ID_MOODS_FIELD + ")" +
+                " REFERENCES " + MOODS_TABLE_NAME +
+                "(" + ID_FIELD + ")";
+        dbConnection.execute(formatSQLAnswers.getStringToCreateDB(reference));              // add reference to another table
+
         insertTableValues(formatSQLMoods, moodsTableFields, getMoodsTableValues());         // inserting ordered values into tables
         insertTableValues(formatSQLAnswers, answersTableFields, getAnswersTableValues());
     }
 
-    // creating table from massive of fields
-    private void createTable(FormatSQL dbCreatorFormatSQL, String[] fields) {
-        String methodName = "createTable";
-        int typeFlag;
-        for (String fieldName : fields) {
-            if (!fields_and_types.containsKey(fieldName)) {
-                logger.printLogWarning("field should be put into types map", methodName);
-                return;
-            }
-            typeFlag = fields_and_types.get(fieldName);                                     // get type of current field
-            switch (typeFlag) {
-                case INTEGER_FLAG:
-                    dbCreatorFormatSQL.setNewField(fieldName, FormatSQL.INTEGER_TYPE);
-                    break;
-                case STRING_FLAG:
-                    dbCreatorFormatSQL.setNewField(fieldName, FormatSQL.STRING_TYPE);
-                    break;
-                default:
-                    logger.printLogWarning("wrong type flag", methodName);
-                    return;
-            }
-
-        }
-        dbConnection.execute(dbCreatorFormatSQL.getStringToCreateDB());                     // creating table after setting all fields
-    }
-
-    private String getSQLCreateMoodsTable() {
-        String sql = "CREATE TABLE MOODS(id_ INT PRIMARY KEY, \n" +
-                "\t\tbyby VARCHAR(500), \n" +
-                "\t\thi VARCHAR(500), \n" +
-                "\t\tmood VARCHAR(500) NOT NULL)";
-    }
-
     // insert massifs of values into table , only after it was created
     private void insertTableValues(FormatSQL dbCreatorFormatSQL, String[] fields, String[][] values) {
-        String methodName = "insertTableValues";
         for(int j = 0; j < values.length; j++)
         {
             String[] rowValues = values[j];                                                 // get massive with all values of current row
             for (int i = 0; i < fields.length; i++) {
                 String fieldName = fields[i];                                               // current field name
                 String currentValue = rowValues[i];                                         // current value
-                int typeFlag = fields_and_types.get(fieldName);
-                switch (typeFlag) {
-                    case INTEGER_FLAG:
-                        dbCreatorFormatSQL.insertValue(fieldName, Integer.valueOf(currentValue));
-                        break;
-                    case STRING_FLAG:
-                        dbCreatorFormatSQL.insertValue(fieldName, currentValue);
-                        break;
-                    default:
-                        logger.printLogWarning("wrong type flag", methodName);
-                        return;
-                }
+                dbCreatorFormatSQL.insertValue(fieldName, currentValue);
             }
             dbConnection.execute(dbCreatorFormatSQL.getValuesToInsert(j+1));            // inserting values of current row into data base, starting from 1
         }
@@ -118,6 +81,7 @@ public class DBCreator {
         private static final String CREATE_TABLE        = "CREATE TABLE";
         private static final String INSERT_INTO         = "INSERT INTO";
         private static final String VALUES              = "VALUES";
+        private static final String PRIMARY_KEY         = "PRIMARY KEY";
 
         // field types
         private static final String INTEGER_TYPE        = "INT";                            // table type for Integer values
@@ -137,6 +101,7 @@ public class DBCreator {
             mapFieldsTypes = new HashMap<>();
             mapFieldsStrings = new HashMap<>();
             mapFieldsIntegers = new HashMap<>();
+            mapFieldsConstraints = new HashMap<>();
         }
 
         // return name of creating table
@@ -151,18 +116,21 @@ public class DBCreator {
             }
         }
 
-        // for creating new field , default type - String
+        // for creating new field , default type - String, no constraint
         private void setNewField(String fieldName) {
-            setNewField(fieldName, FormatSQL.STRING_TYPE);
+            setNewField(fieldName, FormatSQL.STRING_TYPE, null);
         }
 
         // for creating new field , custom type
-        private void setNewField(String fieldName, String fieldType) {
-            mapFieldsTypes.put(fieldName, fieldType);
+        private void setNewField(String fieldName, String type, String constraint) {
+            mapFieldsTypes.put(fieldName, type);
+            if (constraint != null && !constraint.isEmpty()) {
+                mapFieldsConstraints.put(fieldName, constraint);
+            }
         }
 
         // get string to create table with declared fields
-        private String getStringToCreateDB() {
+        private String getStringToCreateDB(String addings) {
             StringBuffer createDBStringBuffer = new StringBuffer();
             createDBStringBuffer
                     .append(FormatSQL.CREATE_TABLE)
@@ -171,12 +139,26 @@ public class DBCreator {
                     .append("(")
                     .append(idFieldName)
                     .append(" ")
-                    .append(FormatSQL.INTEGER_TYPE);
-            mapFieldsTypes.forEach((kField, vType) -> createDBStringBuffer
+                    .append(FormatSQL.INTEGER_TYPE)
+                    .append(" ")
+                    .append(FormatSQL.PRIMARY_KEY);
+            mapFieldsTypes.forEach((kField, vType) -> {                             // add all table's fields
+                createDBStringBuffer
                     .append(", ")
                     .append(kField)
                     .append(" ")
-                    .append(vType));
+                    .append(vType);
+                if(mapFieldsConstraints.containsKey(kField)) {                      // add constraint for a field
+                    createDBStringBuffer
+                            .append(" ")
+                            .append(mapFieldsConstraints.get(kField));
+                }
+            });
+            if (addings != null && !addings.isEmpty()) {                            // add reference
+                createDBStringBuffer
+                        .append(", ")
+                        .append(addings);
+            }
             createDBStringBuffer.append(")");
             return createDBStringBuffer.toString();
         }
@@ -191,13 +173,25 @@ public class DBCreator {
             mapFieldsIntegers.putAll(mapValues);
         }
 
-        // insert new string type value
+        // insert new value (any type)
         private void insertValue(String field, String value) {
+            switch (mapFieldsTypes.get(field)) {
+                case FormatSQL.STRING_TYPE:
+                    insertStringValue(field, value);
+                    break;
+                case FormatSQL.INTEGER_TYPE:
+                    insertIntegerValue(field, Integer.valueOf(value));
+                    break;
+            }
+        }
+
+        // insert new string type value
+        private void insertStringValue(String field, String value) {
             mapFieldsStrings.put(field, value);
         }
 
         // insert new integer type value
-        private void insertValue(String field, int value) {
+        private void insertIntegerValue(String field, int value) {
             mapFieldsIntegers.put(field,value);
         }
 

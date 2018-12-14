@@ -35,8 +35,10 @@ public enum DBMoods {
         DBMoods moods[] = DBMoods.values();
         int length = moods.length;
         DBMoods newMood = moods[rand.nextInt(length-1)];        // choose new mood
-        while (newMood.compareTo(excludedMood) == 0) {                  // while the same - choose another (no need to check for null)
-            newMood = moods[rand.nextInt(length-1)];
+        if (excludedMood != null) {
+            while (newMood.compareTo(excludedMood) == 0) {              // while the same - choose another
+                newMood = moods[rand.nextInt(length-1)];
+            }
         }
         return newMood;
     }
