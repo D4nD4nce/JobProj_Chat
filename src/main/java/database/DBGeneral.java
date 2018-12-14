@@ -1,6 +1,7 @@
 package database;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -42,8 +43,12 @@ public class DBGeneral {
     public static final String HI_FIELD                 = "hi";
     public static final String BYBY_FIELD               = "byby";
 
+    // ----------- limit -----------
+    private static final int SELECTION_MAX_LIMIT        = 5;                // limit for number of rows in sql requests
+    private static final int SELECTION_MIN_LIMIT        = 10;               // bunch of answers should be bigger or equals this value to separate sql requests
+
     private DBConnection currentConnection;
-    private DBMoods currentMood;
+    private DBTypesKeys currentMood;
     private String currentAnswer;                                           // current randomly chosen answer
     private List<String> lstRandomAnswers;                                  // list with current random answers
     private String welcomeAnswer;                                           // "welcome" answer from current bunch
@@ -78,7 +83,7 @@ public class DBGeneral {
 
     // choosing another bunch of answers
     public void chooseNewAnswers() {
-        this.currentMood = DBMoods.getRandomMood(currentMood);
+        this.currentMood = DBTypesKeys.getRandomMood(currentMood);
         readAllIntoArray();                                                 // reading current table and setting all variables
     }
 
@@ -110,6 +115,39 @@ public class DBGeneral {
          * 5. get hi and by answers
          */
 
+        /*
+        !!!
+        ID может быть разным - некоторые строки удалены. Нельзя по нему ориентироваться.
+        Необходимо считать ряды по порядку, не зависящему от ID таблицы.
+         */
+        lstRandomAnswers.clear();
+        try {
+            String requestForCountRows = DBRequests.getCountOfChosenTypeRows(currentMood.getMoodId());
+            ResultSet resultSetAnswersCount = currentConnection.executeQuery(requestForCountRows);      // get count of chosen type answers
+            int answersCount = resultSetAnswersCount.getInt(1);
+            resultSetAnswersCount.close();
+            if (answersCount >= SELECTION_MIN_LIMIT) {                                                  // compare with limit
+                String requestForAnswers = DBRequests.getAnswersOfChosenType(currentMood.getMoodId(), 0, SELECTION_MAX_LIMIT);
+                ResultSet resultSetAnswers = currentConnection.executeQuery(requestForAnswers);         // less answers then limit - taking all from DB
+                while(!resultSetAnswers.isAfterLast()) {
+                    lstRandomAnswers.add(resultSetAnswers.getString(1));
+                    resultSetAnswers.next();
+                }
+                resultSetAnswers.close();
+            } else {
+                String requestForSmallestId = DBRequests.getSmallestIdInType(currentMood.getMoodId());
+                ResultSet resultSmallestID = currentConnection.executeQuery(requestForSmallestId);
+                int leastID = resultSmallestID.getInt(1);
+//                int randomID
+            }
+
+
+
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 //        try {
 //            Statement statement = currentConnection.createStatement();
 //            ResultSet resultSet = statement.executeQuery("SELECT " + StringHelper.arrayToString(AllFieldsAnswer.getFieldsList()) +
@@ -139,19 +177,19 @@ public class DBGeneral {
     public String getAnswer(int flag) {
         switch (flag) {
             case READ_RANDOM_STRING:
-                return readRandom();
+                return getRandom();
             case READ_WELCOME:
-                return readWelcome();
+                return getWelcome();
             case READ_GOODBYE:
                 currentConnection.closeConnection();
-                return readGoodbye();
+                return getGoodbye();
             default:
                 return "";
         }
     }
 
     // general - get random string from chosen Table
-    private String readRandom() {
+    private String getRandom() {
         if (!lstRandomAnswers.isEmpty()) {
             Random rand = new Random();
             currentAnswer = lstRandomAnswers.get(rand.nextInt(lstRandomAnswers.size()));
@@ -160,12 +198,12 @@ public class DBGeneral {
     }
 
     // returns "welcome" value
-    private String readWelcome() {
+    private String getWelcome() {
         return welcomeAnswer;
     }
 
     // returns "goodbye" value
-    private String readGoodbye() {
+    private String getGoodbye() {
         return goodbyeAnswer;
     }
 }

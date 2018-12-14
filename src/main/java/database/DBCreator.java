@@ -12,15 +12,15 @@ import static database.DBGeneral.*;
 
 public class DBCreator {
     // static map keeps types of all fields from tables
-    private final static Map<String,String> fields_and_types;
-    static {
-        fields_and_types = new HashMap<>();
-        fields_and_types.put(MOODS_FIELD, FormatSQL.STRING_TYPE);
-        fields_and_types.put(HI_FIELD, FormatSQL.STRING_TYPE);
-        fields_and_types.put(BYBY_FIELD, FormatSQL.STRING_TYPE);
-        fields_and_types.put(ANSWERS_FIELD, FormatSQL.STRING_TYPE);
-        fields_and_types.put(ID_MOODS_FIELD, FormatSQL.INTEGER_TYPE);
-    }
+//    private final static Map<String,String> fields_and_types;
+//    static {
+//        fields_and_types = new HashMap<>();
+//        fields_and_types.put(MOODS_FIELD, FormatSQL.STRING_TYPE);
+//        fields_and_types.put(HI_FIELD, FormatSQL.STRING_TYPE);
+//        fields_and_types.put(BYBY_FIELD, FormatSQL.STRING_TYPE);
+//        fields_and_types.put(ANSWERS_FIELD, FormatSQL.STRING_TYPE);
+//        fields_and_types.put(ID_MOODS_FIELD, FormatSQL.INTEGER_TYPE);
+//    }
 
     private static final String DB_EXTENSION = ".mv.db";                                    // extension for db files
     private final LogHelper logger = new LogHelper(DBCreator.class.getName());
@@ -244,13 +244,13 @@ public class DBCreator {
 
     // get all values for table to insert (ordered !)
     private String[][] getMoodsTableValues() {
-        String soso = DBMoods.SO_SO_MOOD.getMoodValue();
-        String sad = DBMoods.SAD_MOOD.getMoodValue();
-        String angry = DBMoods.ANGRY_MOOD.getMoodValue();
-        String happy = DBMoods.HAPPY_MOOD.getMoodValue();
+        String soso = DBTypesKeys.SO_SO_MOOD.getMoodValue();
+        String sad = DBTypesKeys.SAD_MOOD.getMoodValue();
+        String angry = DBTypesKeys.ANGRY_MOOD.getMoodValue();
+        String happy = DBTypesKeys.HAPPY_MOOD.getMoodValue();
         // moods table
         return new String[][]{
-                //moods     hi answers                  by answers                  // id_ (index + 1)
+                //moods     hi answers                  by answers                  // id_ (enum index + 1)
                 { soso,     "hey",                      "by"},                      // 1
                 { sad,      "welcome to sad world",     "so, you too ..."},         // 2
                 { angry,    "get out!",                 "thanks god, you away"},    // 3
@@ -260,10 +260,10 @@ public class DBCreator {
 
     // get all values for table to insert (ordered !)
     private String[][] getAnswersTableValues() {
-        String idMoodSoso = String.valueOf(DBMoods.SO_SO_MOOD.getMoodId());
-        String idMoodSad = String.valueOf(DBMoods.SAD_MOOD.getMoodId());
-        String idMoodAngry = String.valueOf(DBMoods.ANGRY_MOOD.getMoodId());
-        String idMoodHappy = String.valueOf(DBMoods.HAPPY_MOOD.getMoodId());
+        String idMoodSoso = String.valueOf(DBTypesKeys.SO_SO_MOOD.getMoodId());
+        String idMoodSad = String.valueOf(DBTypesKeys.SAD_MOOD.getMoodId());
+        String idMoodAngry = String.valueOf(DBTypesKeys.ANGRY_MOOD.getMoodId());
+        String idMoodHappy = String.valueOf(DBTypesKeys.HAPPY_MOOD.getMoodId());
         // answers table
         return new String[][]{
                 // so so
