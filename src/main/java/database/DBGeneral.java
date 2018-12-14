@@ -27,8 +27,8 @@ public class DBGeneral {
     public static final String DATABASE_PASSWORD        = "root";
 
     // ----------- tables -----------
-    public static final String ANSWERS_TABLE_NAME       = "RANDOM_ANSWERS";
-    public static final String MOODS_TABLE_NAME         = "MOODS";
+    public static final String ANSWERS_TABLE_NAME       = "random_answers";
+    public static final String MOODS_TABLE_NAME         = "moods";
 
     // ----------- row ID -----------
     public static final String ID_FIELD                 = "id_";             // name of id field (the same for all tables)
@@ -98,6 +98,18 @@ public class DBGeneral {
 
     // read all from table, adding answers into current fields
     private void readAllIntoArray() {
+        /*
+         * 1. get count of chosen type answers (allValues)
+         * 2. compare with limit (limit)
+         * 3. if it's bigger then limit:
+         *  - get min id in ordered answers of current type
+         *  - get random value that is  < (allValues - limit)
+         *  - get bunch of answers starting from random id of current type and with limit
+         * 4. if it's less or equals limit:
+         *  - get bunch of chosen type answers
+         * 5. get hi and by answers
+         */
+
 //        try {
 //            Statement statement = currentConnection.createStatement();
 //            ResultSet resultSet = statement.executeQuery("SELECT " + StringHelper.arrayToString(AllFieldsAnswer.getFieldsList()) +
@@ -157,5 +169,3 @@ public class DBGeneral {
         return goodbyeAnswer;
     }
 }
-
-// INSERT INTO table_name (RANDOM_2 , RANDOM_3 , RANDOM_1 , GOODBYE , WELCOME , ID ) VALUES ('random_2', 'random_3', 'random_1', 'byby', 'hi', 8)
