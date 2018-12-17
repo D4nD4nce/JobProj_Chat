@@ -6,6 +6,16 @@ Current list of commands:
 - /help
 - /close
 
+Command to start in maven:
+* `mvn compile package exec:java` 
+
+# Versions:
+
+VERSION 2.1
+ - reworked data base
+
+//==//==//==//==//==//==//==//==
+
 VERSION 2.0
 
 Add:
