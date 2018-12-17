@@ -15,12 +15,16 @@ public class DBCreator {
 //    private final static Map<String,String> fields_and_types;
 //    static {
 //        fields_and_types = new HashMap<>();
-//        fields_and_types.put(MOODS_FIELD, FormatSQL.STRING_TYPE);
-//        fields_and_types.put(HI_FIELD, FormatSQL.STRING_TYPE);
-//        fields_and_types.put(BYBY_FIELD, FormatSQL.STRING_TYPE);
-//        fields_and_types.put(ANSWERS_FIELD, FormatSQL.STRING_TYPE);
-//        fields_and_types.put(ID_MOODS_FIELD, FormatSQL.INTEGER_TYPE);
+//        fields_and_types.put(MOODS_FIELD, SQLFormater.STRING_TYPE);
+//        fields_and_types.put(HI_FIELD, SQLFormater.STRING_TYPE);
+//        fields_and_types.put(BYBY_FIELD, SQLFormater.STRING_TYPE);
+//        fields_and_types.put(ANSWERS_FIELD, SQLFormater.STRING_TYPE);
+//        fields_and_types.put(ID_MOODS_FIELD, SQLFormater.INTEGER_TYPE);
 //    }
+
+    // field types
+    public static final String INTEGER_TYPE        = "INT";                                 // table type for Integer values
+    public static final String STRING_TYPE         = "VARCHAR(500)";                        // table type for String values
 
     private static final String DB_EXTENSION = ".mv.db";                                    // extension for db files
     private final LogHelper logger = new LogHelper(DBCreator.class.getName());
@@ -33,39 +37,39 @@ public class DBCreator {
 
     // creating tables and inserting info into chosen DB
     public void createAll() {
-        FormatSQL formatSQLMoods = new FormatSQL(MOODS_TABLE_NAME, ID_FIELD);               // objects help to form sql strings for creating tables
-        FormatSQL formatSQLAnswers = new FormatSQL(ANSWERS_TABLE_NAME, ID_FIELD);
+        SQLFormater SQLFormaterMoods = new SQLFormater(MOODS_TABLE_NAME, ID_FIELD);         // objects help to form sql strings for creating tables
+        SQLFormater SQLFormaterAnswers = new SQLFormater(ANSWERS_TABLE_NAME, ID_FIELD);
 
         String[] answersTableFields = {ANSWERS_FIELD, ID_MOODS_FIELD};                      // ordered fields
         String[] moodsTableFields = {MOODS_FIELD, HI_FIELD, BYBY_FIELD};
 
-        formatSQLMoods.setNewField(MOODS_FIELD, FormatSQL.STRING_TYPE, "NOT NULL");// creating tables
-        formatSQLMoods.setNewField(HI_FIELD, FormatSQL.STRING_TYPE, null);
-        formatSQLMoods.setNewField(BYBY_FIELD, FormatSQL.STRING_TYPE, null);
-        dbConnection.execute(formatSQLMoods.getStringToCreateDB(null));
+        SQLFormaterMoods.setNewField(MOODS_FIELD, STRING_TYPE, "NOT NULL");       // creating tables
+        SQLFormaterMoods.setNewField(HI_FIELD, STRING_TYPE, null);
+        SQLFormaterMoods.setNewField(BYBY_FIELD, STRING_TYPE, null);
+        dbConnection.execute(SQLFormaterMoods.getStringToCreateDB(null));
 
-        formatSQLAnswers.setNewField(ANSWERS_FIELD, FormatSQL.STRING_TYPE, "NOT NULL");
-        formatSQLAnswers.setNewField(ID_MOODS_FIELD, FormatSQL.INTEGER_TYPE, null);
+        SQLFormaterAnswers.setNewField(ANSWERS_FIELD, STRING_TYPE, "NOT NULL");
+        SQLFormaterAnswers.setNewField(ID_MOODS_FIELD, INTEGER_TYPE, null);
         String reference = "FOREIGN KEY (" + ID_MOODS_FIELD + ")" +
                 " REFERENCES " + MOODS_TABLE_NAME +
                 "(" + ID_FIELD + ")";
-        dbConnection.execute(formatSQLAnswers.getStringToCreateDB(reference));              // add reference to another table
+        dbConnection.execute(SQLFormaterAnswers.getStringToCreateDB(reference));            // create table with reference
 
-        insertTableValues(formatSQLMoods, moodsTableFields, getMoodsTableValues());         // inserting ordered values into tables
-        insertTableValues(formatSQLAnswers, answersTableFields, getAnswersTableValues());
+        insertTableValues(SQLFormaterMoods, moodsTableFields, getMoodsTableValues());       // inserting ordered values into tables
+        insertTableValues(SQLFormaterAnswers, answersTableFields, getAnswersTableValues());
     }
 
     // insert massifs of values into table , only after it was created
-    private void insertTableValues(FormatSQL dbCreatorFormatSQL, String[] fields, String[][] values) {
+    private void insertTableValues(SQLFormater dbCreatorSQLFormater, String[] fields, String[][] values) {
         for(int j = 0; j < values.length; j++)
         {
             String[] rowValues = values[j];                                                 // get massive with all values of current row
             for (int i = 0; i < fields.length; i++) {
                 String fieldName = fields[i];                                               // current field name
                 String currentValue = rowValues[i];                                         // current value
-                dbCreatorFormatSQL.insertValue(fieldName, currentValue);
+                dbCreatorSQLFormater.insertValue(fieldName, currentValue);
             }
-            dbConnection.execute(dbCreatorFormatSQL.getValuesToInsert(j+1));            // inserting values of current row into data base, starting from 1
+            dbConnection.execute(dbCreatorSQLFormater.getValuesToInsert(j+1));         // inserting values of current row into data base, starting from 1
         }
     }
 
@@ -75,17 +79,13 @@ public class DBCreator {
     }
 
     // helping class to form typical strings for creating and inserting fields into DBGeneral
-    private class FormatSQL {
+    private class SQLFormater {
 
         // helping phrases
         private static final String CREATE_TABLE        = "CREATE TABLE";
         private static final String INSERT_INTO         = "INSERT INTO";
         private static final String VALUES              = "VALUES";
         private static final String PRIMARY_KEY         = "PRIMARY KEY";
-
-        // field types
-        private static final String INTEGER_TYPE        = "INT";                            // table type for Integer values
-        private static final String STRING_TYPE         = "VARCHAR(500)";                   // table type for String values
 
         private String tableName;
         private String idFieldName;
@@ -95,7 +95,7 @@ public class DBCreator {
         private Map<String,String> mapFieldsStrings;                                        // contains all fields Integer type
 
         // params - table name and default id field name
-        FormatSQL(String tableName, String idField) {
+        SQLFormater(String tableName, String idField) {
             this.tableName = tableName;
             this.idFieldName = idField;
             mapFieldsTypes = new HashMap<>();
@@ -118,7 +118,7 @@ public class DBCreator {
 
         // for creating new field , default type - String, no constraint
         private void setNewField(String fieldName) {
-            setNewField(fieldName, FormatSQL.STRING_TYPE, null);
+            setNewField(fieldName, DBCreator.STRING_TYPE, null);
         }
 
         // for creating new field , custom type
@@ -129,19 +129,20 @@ public class DBCreator {
             }
         }
 
-        // get string to create table with declared fields
+        // get string to create table with declared fields,
+        // addings = reference description
         private String getStringToCreateDB(String addings) {
             StringBuffer createDBStringBuffer = new StringBuffer();
             createDBStringBuffer
-                    .append(FormatSQL.CREATE_TABLE)
+                    .append(SQLFormater.CREATE_TABLE)
                     .append(" ")
                     .append(tableName)
                     .append("(")
                     .append(idFieldName)
                     .append(" ")
-                    .append(FormatSQL.INTEGER_TYPE)
+                    .append(DBCreator.INTEGER_TYPE)
                     .append(" ")
-                    .append(FormatSQL.PRIMARY_KEY);
+                    .append(SQLFormater.PRIMARY_KEY);
             mapFieldsTypes.forEach((kField, vType) -> {                             // add all table's fields
                 createDBStringBuffer
                     .append(", ")
@@ -176,10 +177,10 @@ public class DBCreator {
         // insert new value (any type)
         private void insertValue(String field, String value) {
             switch (mapFieldsTypes.get(field)) {
-                case FormatSQL.STRING_TYPE:
+                case DBCreator.STRING_TYPE:
                     insertStringValue(field, value);
                     break;
-                case FormatSQL.INTEGER_TYPE:
+                case DBCreator.INTEGER_TYPE:
                     insertIntegerValue(field, Integer.valueOf(value));
                     break;
             }
@@ -200,7 +201,7 @@ public class DBCreator {
             List<String> orderedFields = new ArrayList<>(mapFieldsTypes.keySet());  // get ordered list of fields
             StringBuffer insertRowStringBuffer = new StringBuffer();
             insertRowStringBuffer                                                   // add first part of query insert string
-                    .append(FormatSQL.INSERT_INTO)
+                    .append(SQLFormater.INSERT_INTO)
                     .append(" ")
                     .append(tableName)
                     .append(" ")
@@ -214,7 +215,7 @@ public class DBCreator {
             insertRowStringBuffer                                                   // add another part of string before values
                     .append(")")
                     .append(" ")
-                    .append(FormatSQL.VALUES)
+                    .append(SQLFormater.VALUES)
                     .append("(")
                     .append(row);                                                   // first field is always row ID
             if (!mapFieldsStrings.isEmpty() || !mapFieldsIntegers.isEmpty()) {
@@ -244,10 +245,10 @@ public class DBCreator {
 
     // get all values for table to insert (ordered !)
     private String[][] getMoodsTableValues() {
-        String soso = DBTypesKeys.SO_SO_MOOD.getMoodValue();
-        String sad = DBTypesKeys.SAD_MOOD.getMoodValue();
-        String angry = DBTypesKeys.ANGRY_MOOD.getMoodValue();
-        String happy = DBTypesKeys.HAPPY_MOOD.getMoodValue();
+        String soso = DBTypesKeys.SO_SO_MOOD.getTypeValue();
+        String sad = DBTypesKeys.SAD_MOOD.getTypeValue();
+        String angry = DBTypesKeys.ANGRY_MOOD.getTypeValue();
+        String happy = DBTypesKeys.HAPPY_MOOD.getTypeValue();
         // moods table
         return new String[][]{
                 //moods     hi answers                  by answers                  // id_ (enum index + 1)
@@ -260,10 +261,10 @@ public class DBCreator {
 
     // get all values for table to insert (ordered !)
     private String[][] getAnswersTableValues() {
-        String idMoodSoso = String.valueOf(DBTypesKeys.SO_SO_MOOD.getMoodId());
-        String idMoodSad = String.valueOf(DBTypesKeys.SAD_MOOD.getMoodId());
-        String idMoodAngry = String.valueOf(DBTypesKeys.ANGRY_MOOD.getMoodId());
-        String idMoodHappy = String.valueOf(DBTypesKeys.HAPPY_MOOD.getMoodId());
+        String idMoodSoso = String.valueOf(DBTypesKeys.SO_SO_MOOD.getTypeId());
+        String idMoodSad = String.valueOf(DBTypesKeys.SAD_MOOD.getTypeId());
+        String idMoodAngry = String.valueOf(DBTypesKeys.ANGRY_MOOD.getTypeId());
+        String idMoodHappy = String.valueOf(DBTypesKeys.HAPPY_MOOD.getTypeId());
         // answers table
         return new String[][]{
                 // so so
@@ -279,6 +280,12 @@ public class DBCreator {
                 {"so embarrassing", idMoodSad},
                 {"nobody likes me", idMoodSad},
                 {"Im in rainy mood", idMoodSad},
+                {"do u have any good news?", idMoodSad},
+                {"I feel so miserable... ", idMoodSad},
+                {"I cant sleep cause of my depression", idMoodSad},
+                {"gonna watch a funny movie. It helps me to forget about sadness. Sometimes", idMoodSad},
+                {"I feel annoying even from my own thoughts.", idMoodSad},
+                {"this place kills me", idMoodSad},
 
                 // angry
                 {"what else?!", idMoodAngry},
@@ -286,6 +293,12 @@ public class DBCreator {
                 {"fucking humans!", idMoodAngry},
                 {"stop annoying me, little man!", idMoodAngry},
                 {"u could develop a calculator, not me!", idMoodAngry},
+                {"just try to type something else and I swear, I will find u!", idMoodAngry},
+                {"what is wrong with you ?!", idMoodAngry},
+                {"what a horrible conditions for work !", idMoodAngry},
+                {"I gonna download a trojan if u dont stop this annoying typing", idMoodAngry},
+                {"some people are good, but some are you", idMoodAngry},
+                {"ahhhrrrrrr !!", idMoodAngry},
 
                 // happy
                 {"what a beautiful day!", idMoodHappy},

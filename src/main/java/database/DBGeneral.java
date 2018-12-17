@@ -1,10 +1,11 @@
 package database;
 
+import helpers.NumberHelper;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /*
  * All data base work logic
@@ -48,11 +49,12 @@ public class DBGeneral {
     private static final int SELECTION_MIN_LIMIT        = 10;               // bunch of answers should be bigger or equals this value to separate sql requests
 
     private DBConnection currentConnection;
-    private DBTypesKeys currentMood;
+    private DBTypesKeys currentType;
     private String currentAnswer;                                           // current randomly chosen answer
     private List<String> lstRandomAnswers;                                  // list with current random answers
-    private String welcomeAnswer;                                           // "welcome" answer from current bunch
-    private String goodbyeAnswer;                                           // "goodbye" answer from current bunch
+    private String hiAnswer;                                                // "welcome" answer from current bunch
+    private String byAnswer;                                                // "goodbye" answer from current bunch
+    private AnswerCounter answerCounter;                                    // helps to count answers if they are separated
 
     // general constructor
     public DBGeneral(){
@@ -62,9 +64,10 @@ public class DBGeneral {
     // opening connection, initializing globals, reading current table
     private void initialize() {
         lstRandomAnswers = new ArrayList<>();
+        answerCounter = new AnswerCounter();
         this.currentAnswer = DBGeneral.DEFAULT_ANSWER;
-        this.welcomeAnswer = DBGeneral.DEFAULT_WELCOME;
-        this.goodbyeAnswer = DBGeneral.DEFAULT_GOODBYE;
+        this.hiAnswer = DBGeneral.DEFAULT_WELCOME;
+        this.byAnswer = DBGeneral.DEFAULT_GOODBYE;
         currentConnection = new DBConnection();
         if (!DBCreator.isExists(DATABASE_PATH)) {
             createDB();
@@ -83,89 +86,53 @@ public class DBGeneral {
 
     // choosing another bunch of answers
     public void chooseNewAnswers() {
-        this.currentMood = DBTypesKeys.getRandomMood(currentMood);
-        readAllIntoArray();                                                 // reading current table and setting all variables
+        this.currentType = DBTypesKeys.getRandomType(currentType);
+        readAnswersFromDB();                                                 // reading current table and setting all variables
     }
 
-    // getting random bunch of answers
-    private int getNewAnswers(int oldRow) {
-
-        // count all rows with ID of chosen mood
-        String sql = "SELECT COUNT(" + ID_FIELD +") FROM" + ANSWERS_TABLE_NAME + " WHERE " + ID_MOODS_FIELD + " = ";// + moodID;
-        ResultSet resultSet = currentConnection.executeQuery(sql);
-//        Random rand = new Random();
-//        int newRow = rand.nextInt(rowsCount);
-//        while ((newRow == oldRow) || (newRow == 0 )) {
-//            newRow = rand.nextInt(rowsCount);
-//        }
-        return oldRow;
-    }
-
-    // read all from table, adding answers into current fields
-    private void readAllIntoArray() {
+    // read answers from table, adding answers into current fields
+    private void readAnswersFromDB() {
         /*
          * 1. get count of chosen type answers (allValues)
          * 2. compare with limit (limit)
          * 3. if it's bigger then limit:
-         *  - get min id in ordered answers of current type
          *  - get random value that is  < (allValues - limit)
-         *  - get bunch of answers starting from random id of current type and with limit
+         *  - get bunch of answers with random value offset of current type and with limit
          * 4. if it's less or equals limit:
          *  - get bunch of chosen type answers
          * 5. get hi and by answers
          */
-
-        /*
-        !!!
-        ID может быть разным - некоторые строки удалены. Нельзя по нему ориентироваться.
-        Необходимо считать ряды по порядку, не зависящему от ID таблицы.
-         */
         lstRandomAnswers.clear();
+        answerCounter.clear();
         try {
-            String requestForCountRows = DBRequests.getCountOfChosenTypeRows(currentMood.getMoodId());
+            String requestForCountRows = DBRequests.getCountOfChosenTypeRows(currentType.getTypeId());
             ResultSet resultSetAnswersCount = currentConnection.executeQuery(requestForCountRows);      // get count of chosen type answers
             int answersCount = resultSetAnswersCount.getInt(1);
-            resultSetAnswersCount.close();
-            if (answersCount >= SELECTION_MIN_LIMIT) {                                                  // compare with limit
-                String requestForAnswers = DBRequests.getAnswersOfChosenType(currentMood.getMoodId(), 0, SELECTION_MAX_LIMIT);
-                ResultSet resultSetAnswers = currentConnection.executeQuery(requestForAnswers);         // less answers then limit - taking all from DB
-                while(!resultSetAnswers.isAfterLast()) {
-                    lstRandomAnswers.add(resultSetAnswers.getString(1));
-                    resultSetAnswers.next();
-                }
-                resultSetAnswers.close();
-            } else {
-                String requestForSmallestId = DBRequests.getSmallestIdInType(currentMood.getMoodId());
-                ResultSet resultSmallestID = currentConnection.executeQuery(requestForSmallestId);
-                int leastID = resultSmallestID.getInt(1);
-//                int randomID
+            ResultSet resultSetAnswers;
+            int randomOffset = 0;
+            // less answers then limit - taking all from DB
+            // more answers then limit - taking only limited bunch with random offset
+            if (answersCount >= SELECTION_MIN_LIMIT) {
+                int maxBound = answersCount - SELECTION_MAX_LIMIT;
+                randomOffset = NumberHelper.getRandomValue(0, maxBound, -1);
+                answerCounter.setCounter(SELECTION_MAX_LIMIT);                                          // set counter for answers
             }
-
-
-
-
-
-        } catch (SQLException e) {
+            String requestRandomAnswers = DBRequests.getAnswers_typeLimitOffset(currentType.getTypeId(), SELECTION_MAX_LIMIT, randomOffset);
+            resultSetAnswers = currentConnection.executeQuery(requestRandomAnswers);
+            while(!resultSetAnswers.isAfterLast()) {                                                    // get random answers
+                lstRandomAnswers.add(resultSetAnswers.getString(1));
+                resultSetAnswers.next();
+            }
+            String requestTwoFields = DBRequests.getMoodsTableValue(HI_FIELD + "," + BYBY_FIELD, currentType.getTypeId());
+            ResultSet resultSetHiByAnswers = currentConnection.executeQuery(requestTwoFields);          // get hi and by answers
+            hiAnswer = resultSetHiByAnswers.getString(HI_FIELD);
+            byAnswer = resultSetHiByAnswers.getString(BYBY_FIELD);
+            resultSetHiByAnswers.close();
+            resultSetAnswersCount.close();
+            resultSetAnswers.close();
+        } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
         }
-//        try {
-//            Statement statement = currentConnection.createStatement();
-//            ResultSet resultSet = statement.executeQuery("SELECT " + StringHelper.arrayToString(AllFieldsAnswer.getFieldsList()) +
-//                    " FROM " + DBGeneral.ANSWER_TABLE_NAME +
-//                    " WHERE " + FormatSQL.ID_FIELD + " = " + currentRow);
-//
-//            lstRandomAnswers.clear();
-//            resultSet.first();
-//            this.welcomeAnswer = resultSet.getString(AllFieldsAnswer.WELCOME.name());
-//            this.goodbyeAnswer = resultSet.getString(AllFieldsAnswer.GOODBYE.name());
-//            lstRandomAnswers.add(resultSet.getString(AllFieldsAnswer.RANDOM_1.name()));
-//            lstRandomAnswers.add(resultSet.getString(AllFieldsAnswer.RANDOM_2.name()));
-//            lstRandomAnswers.add(resultSet.getString(AllFieldsAnswer.RANDOM_3.name()));
-//            //statement.close();
-//            //resultSet.close();
-//        } catch (SQLException | NullPointerException e) {
-//            e.printStackTrace();
-//        }
     }
 
     // get current variable marked as answer
@@ -188,22 +155,77 @@ public class DBGeneral {
         }
     }
 
-    // general - get random string from chosen Table
+    // general - get random string from chosen Table, check for counter and getting new answers if they are separated
     private String getRandom() {
         if (!lstRandomAnswers.isEmpty()) {
-            Random rand = new Random();
-            currentAnswer = lstRandomAnswers.get(rand.nextInt(lstRandomAnswers.size()));
+            int oldIndex = (lstRandomAnswers.contains(currentAnswer)) ? lstRandomAnswers.indexOf(currentAnswer) : -1;
+            int maxRandom = lstRandomAnswers.size() - 1;
+            currentAnswer = lstRandomAnswers.get(NumberHelper.getRandomValue(0, maxRandom, oldIndex));
+            if (answerCounter.isActivated()) {
+                answerCounter.doCount();
+                if (answerCounter.isTriggered()) {
+                    readAnswersFromDB();                                                                // get new bunch of random answers without changing type
+                }
+            }
         }
         return currentAnswer;
     }
 
-    // returns "welcome" value
+    // returns hi value
     private String getWelcome() {
-        return welcomeAnswer;
+        return hiAnswer;
     }
 
-    // returns "goodbye" value
+    // returns by value
     private String getGoodbye() {
-        return goodbyeAnswer;
+        return byAnswer;
+    }
+
+    /*
+     * helps to control number of answers in case of separation
+     * counts how many answers have been shown to find out when to get new one's from dataBase
+     */
+    private class AnswerCounter {
+        private int counter;
+        private boolean activated = false;
+        private boolean trigger = false;
+
+        private void setCounter(int count) {
+            this.counter = count;
+            if(isPositive(count)) {
+                activated = true;
+            }
+        }
+
+        private void doCount() {
+            if (activated) {
+                counter -= 1;
+                if (!isPositive(counter)) {
+                    trigger = true;
+                }
+            }
+        }
+
+        private void clear() {
+            activated = false;
+            trigger = false;
+            counter = 0;
+        }
+
+        private int getCounter() {
+            return counter;
+        }
+
+        private boolean isActivated() {
+            return activated;
+        }
+
+        private boolean isTriggered() {
+            return trigger;
+        }
+
+        private boolean isPositive(int count) {
+            return count > 0;
+        }
     }
 }

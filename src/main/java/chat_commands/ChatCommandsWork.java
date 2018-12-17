@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class ChatCommandsWork {
     private static final String STRING_IS_EMPTY         = "ur message is empty, please, type something else";
-    private static final String ANOTHER_FILE            = "new file chosen";
+    private static final String ANOTHER_FILE            = "new companion chosen";
 
     private String userText;
     private DBGeneral baseDB;
@@ -19,7 +19,7 @@ public class ChatCommandsWork {
     private TextShower textShower;
 
     public ChatCommandsWork() {
-        baseDB = new DBGeneral();                    // initializing current file
+        baseDB = new DBGeneral();                   // initializing current file
         textShower = new TextShower();
         showWelcome();                              // showing "welcome" message
     }

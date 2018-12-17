@@ -38,7 +38,7 @@ public enum Answers {
     }
 
     // for "hello" and "bye" like words
-    private static boolean checkFirstWord (String phraseToCheck, List<String> listToCompare) {
+    private static boolean checkFirstWord(String phraseToCheck, List<String> listToCompare) {
         for (String compareWord : listToCompare) {
             if (compareWord.equals(phraseToCheck.substring(0, compareWord.length()))) {
                 return true;
@@ -48,14 +48,14 @@ public enum Answers {
     }
 
     // for comparative phrases
-    private static boolean checkPhrase (String userPhrase, List<String> lstPhraseWords) {
-        StringBuffer regularEpression = new StringBuffer("[a-z]");
+    private static boolean checkPhrase(String userPhrase, List<String> lstPhraseWords) {
+        StringBuilder regularExpression = new StringBuilder("[a-z]");
         for (String word : lstPhraseWords) {
-            regularEpression
+            regularExpression
                     .append(word)
                     .append("[a-z]");
         }
-        return Pattern.matches(regularEpression.toString(), userPhrase);
+        return Pattern.matches(regularExpression.toString(), userPhrase);
         //return false;
     }
 

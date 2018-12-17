@@ -20,7 +20,7 @@ public enum ChatCommands {
     static {
        commandsMap = new HashMap<>();
        commandsMap.put("/close", new CommandsDescription(CLOSE_CHAT, "close program"));
-       commandsMap.put("/change", new CommandsDescription(CHANGE_ANSWERS, "choose another file to get answers"));
+       commandsMap.put("/change", new CommandsDescription(CHANGE_ANSWERS, "choose another companion"));
        commandsMap.put("/help", new CommandsDescription(SHOW_HELP, "get all commands description"));
     }
 

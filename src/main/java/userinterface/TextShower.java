@@ -5,11 +5,11 @@ package userinterface;
  * */
 
 public class TextShower {
+
     public void setOutputText(String str) {
-        if (str == null) {
-            return;
+        if (str != null) {
+            outputConsole(str);
         }
-        outputConsole(str);
     }
 
     private void outputConsole(String str) {
