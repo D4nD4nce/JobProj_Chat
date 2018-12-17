@@ -1,4 +1,4 @@
-package commands;
+package chat_commands;
 
 /*
 * general enum class for all special commands in program
@@ -8,7 +8,7 @@ package commands;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum AllCommands {
+public enum ChatCommands {
     NO_COMMANDS_FOUND,              // no special commands, return random answer
     CHANGE_ANSWERS,                 // change a place where answers are read from
     CLOSE_CHAT,                     // shutdown program
@@ -20,7 +20,7 @@ public enum AllCommands {
     static {
        commandsMap = new HashMap<>();
        commandsMap.put("/close", new CommandsDescription(CLOSE_CHAT, "close program"));
-       commandsMap.put("/change", new CommandsDescription(CHANGE_ANSWERS, "choose another file to get answers"));
+       commandsMap.put("/change", new CommandsDescription(CHANGE_ANSWERS, "choose another companion"));
        commandsMap.put("/help", new CommandsDescription(SHOW_HELP, "get all commands description"));
     }
 
@@ -32,7 +32,7 @@ public enum AllCommands {
     }
 
     // checking input for having command
-    public static AllCommands commandCheck(String txt) {
+    public static ChatCommands commandCheck(String txt) {
         if (txt == null || txt.isEmpty()){
             return EMPTY_STRING;
         }
@@ -41,15 +41,15 @@ public enum AllCommands {
 
     // static nested class encapsulates commands with descriptions
     private static final class CommandsDescription {
-        private AllCommands commandValue;
+        private ChatCommands commandValue;
         private String commandDescription;
 
-        CommandsDescription(AllCommands value, String description) {
+        CommandsDescription(ChatCommands value, String description) {
             commandValue = value;
             commandDescription = description;
         }
 
-        AllCommands getCommandValue() {
+        ChatCommands getCommandValue() {
             return commandValue;
         }
 

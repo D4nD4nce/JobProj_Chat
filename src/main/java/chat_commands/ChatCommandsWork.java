@@ -1,32 +1,32 @@
-package commands;
+package chat_commands;
 
 /*
  * Class works with general logic, gets and executes user commands
  * */
 
-import db_work.DataBase;
+import database.DBGeneral;
 import userinterface.TextShower;
 
 import java.util.Map;
 
-public class CommandWork {
+public class ChatCommandsWork {
     private static final String STRING_IS_EMPTY         = "ur message is empty, please, type something else";
-    private static final String ANOTHER_FILE            = "new file chosen";
+    private static final String ANOTHER_FILE            = "new companion chosen";
 
     private String userText;
-    private DataBase baseDB;
-    private AllCommands currentCommand;
+    private DBGeneral baseDB;
+    private ChatCommands currentCommand;
     private TextShower textShower;
 
-    public CommandWork() {
-        baseDB = new DataBase();                    // initializing current file
+    public ChatCommandsWork() {
+        baseDB = new DBGeneral();                   // initializing current file
         textShower = new TextShower();
         showWelcome();                              // showing "welcome" message
     }
 
     // shows "welcome" string (on startup only)
     private void showWelcome() {
-        textShower.setOutputText(baseDB.getAnswer(DataBase.READ_WELCOME));
+        textShower.setOutputText(baseDB.getAnswer(DBGeneral.READ_WELCOME));
     }
 
     // general answer for user, return false on shutdown command
@@ -35,7 +35,7 @@ public class CommandWork {
             return false;
         }
         this.userText = txt;
-        this.currentCommand = AllCommands.commandCheck(txt);
+        this.currentCommand = ChatCommands.commandCheck(txt);
         if (currentCommand != null){
             switch (currentCommand) {
                 case NO_COMMANDS_FOUND:
@@ -62,29 +62,29 @@ public class CommandWork {
 
     // shows general random answer for user
     private void showText() {
-        textShower.setOutputText(baseDB.getAnswer(DataBase.READ_RANDOM_STRING));
+        textShower.setOutputText(baseDB.getAnswer(DBGeneral.READ_RANDOM_STRING));
     }
 
     // changing place where answers are read from
     private void changeAnswers() {
-        baseDB.chooseNewTable();
-        textShower.setOutputText(CommandWork.ANOTHER_FILE);
+        baseDB.chooseNewAnswers();
+        textShower.setOutputText(ChatCommandsWork.ANOTHER_FILE);
     }
 
     // answer for empty input
     private void stringIsEmpty() {
-        textShower.setOutputText(CommandWork.STRING_IS_EMPTY);
+        textShower.setOutputText(ChatCommandsWork.STRING_IS_EMPTY);
     }
 
     // show help: commands and description
     private void showHelp() {
-        Map<String,String> descriptionMap = AllCommands.getCommandsWithDescription();
+        Map<String,String> descriptionMap = ChatCommands.getCommandsWithDescription();
         descriptionMap.forEach((k,v) -> textShower.setOutputText(k + "\t\t\t\t" + v));
     }
 
     // shows "goodbye" string (on shutdown only)
     private void closeProgram() {
-        textShower.setOutputText(baseDB.getAnswer(DataBase.READ_GOODBYE));
+        textShower.setOutputText(baseDB.getAnswer(DBGeneral.READ_GOODBYE));
 
     }
 
@@ -94,7 +94,7 @@ public class CommandWork {
     }
 
     // get current command if it exists
-    public AllCommands getCurrentCommand() {
+    public ChatCommands getCurrentCommand() {
         return currentCommand;
     }
 }
